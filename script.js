@@ -502,7 +502,7 @@ class TarotApp {
     // Предзагрузка рубашки карты
     preloadCardBack() {
         const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.png';
+        cardBackImage.src = 'images/card_back.jpg';
         
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
@@ -700,3 +700,4 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new TarotApp();
 });
+

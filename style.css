@@ -39,21 +39,6 @@ body {
     line-height: 1.4;
 }
 
-.deck-selector {
-    margin: 15px 0;
-    text-align: center;
-}
-
-.deck-selector select {
-    background: rgba(255,255,255,0.9);
-    border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-}
-
 .counter {
     font-size: 16px;
     font-weight: bold;
@@ -106,14 +91,18 @@ body {
     padding: 10px;
 }
 
-/* СТИЛЬ РУБАШКИ КАРТ С ЛОКАЛЬНЫМ ИЗОБРАЖЕНИЕМ */
+/* ОБНОВЛЕННЫЙ СТИЛЬ РУБАШКИ - БЕЗ ЭМОДЗИ, ФОТО НА ВЕСЬ РАДИУС */
 .card-back {
-    background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+    background-image: url('images/card_back.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border: 3px solid #8B4513;
     position: relative;
     overflow: hidden;
 }
 
+/* Fallback если изображение не загрузится */
 .card-back::before {
     content: "";
     position: absolute;
@@ -121,21 +110,18 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('images/card_back.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 8px;
+    background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+    border-radius: 10px;
+    z-index: -1;
 }
 
-/* Fallback если изображение не загрузится */
-.card-back::after {
+/* УБРАТЬ ЭМОДЗИ (этот блок полностью удаляем или комментируем) */
+/* .card-back::after {
     content: "🎴";
-    font-size: 24px;
-    opacity: 0.3;
-    position: relative;
-    z-index: 1;
-}
+    font-size: 32px;
+    opacity: 0.9;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+} */
 
 /* СТИЛЬ ЛИЦЕВОЙ СТОРОНЫ */
 .card-front {
@@ -277,8 +263,8 @@ body {
     transform: translateY(-5px);
 }
 
-.card:hover .card-back::before {
-    transform: scale(1.05);
+.card:hover .card-back {
+    transform: scale(1.02);
     transition: transform 0.3s ease;
 }
 
@@ -300,13 +286,14 @@ body {
     margin: 5px 0;
 }
 
-/* Индикатор загрузки */
-.card-back.loading::before {
-    opacity: 0.7;
+/* Индикатор загрузки для рубашки */
+.card-back.loading {
+    background: linear-gradient(45deg, #8B0000, #B22222);
+    border: 3px solid #FFD700;
 }
 
 .card-back.loading::after {
     content: "🔄";
-    font-size: 20px;
+    font-size: 24px;
     opacity: 0.8;
 }

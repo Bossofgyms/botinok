@@ -487,6 +487,7 @@ class TarotApp {
         this.imageLoadErrors = new Set();
         this.deckType = 'full';
         this.cardBackLoaded = false;
+        this.backgroundLoaded = false;
         this.init();
     }
 
@@ -499,7 +500,23 @@ class TarotApp {
     }
 
     preloadAssets() {
-        // Предзагрузка рубашки
+        // Предзагрузка фона приложения
+        const bgImage = new Image();
+        bgImage.src = 'images/background.jpg';
+        
+        bgImage.onload = () => {
+            console.log('✅ Фон приложения загружен');
+            this.backgroundLoaded = true;
+            document.body.style.background = 'url("images/background.jpg") center/cover fixed';
+        };
+        
+        bgImage.onerror = () => {
+            console.warn('❌ Фон приложения не загружен, используем градиент');
+            this.backgroundLoaded = false;
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        };
+
+        // Предзагрузка рубашки карт
         const cardBackImage = new Image();
         cardBackImage.src = 'images/card_back.jpg';
         
@@ -514,12 +531,6 @@ class TarotApp {
             this.cardBackLoaded = false;
             this.updateCardBacks();
         };
-
-        // Предзагрузка фона
-        const bgImage = new Image();
-        bgImage.src = 'images/background.jpg';
-        bgImage.onload = () => console.log('✅ Фон загружен');
-        bgImage.onerror = () => console.warn('❌ Фон не загружен, используем градиент');
     }
 
     updateCardBacks() {
@@ -527,8 +538,10 @@ class TarotApp {
         cardBacks.forEach(back => {
             if (!this.cardBackLoaded) {
                 back.classList.add('fallback');
+                back.style.background = 'linear-gradient(45deg, #8B4513, #A0522D)';
             } else {
                 back.classList.remove('fallback');
+                back.style.background = 'url("images/card_back.jpg") center/cover no-repeat';
             }
         });
     }
@@ -577,7 +590,7 @@ class TarotApp {
                     <div class="card-back ${cardBackClass}"></div>
                     <div class="card-front">
                         <img src="${card.image}" alt="${card.name}" class="card-image"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.padding='15px';">
+                             onerror="this.style.display='none';">
                         <div class="card-info">
                             <div class="card-name">${this.getShortName(card.name)}</div>
                             <div class="card-meaning">${card.meaning}</div>

@@ -492,27 +492,45 @@ class TarotApp {
 
     init() {
         this.renderQuestion();
-        this.preloadCardBack();
+        this.preloadAssets();
         this.generateCards();
         this.setupEventListeners();
-        console.log('Tarot Mini App initialized - Full Screen Cards');
+        console.log('Tarot App initialized');
     }
 
-    preloadCardBack() {
+    preloadAssets() {
+        // Предзагрузка рубашки
         const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.png';
+        cardBackImage.src = 'images/card_back.jpg';
         
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
             this.cardBackLoaded = true;
-            this.renderCards();
+            this.updateCardBacks();
         };
         
         cardBackImage.onerror = () => {
-            console.warn('❌ Не удалось загрузить рубашку карт');
+            console.warn('❌ Рубашка карт не загружена, используем fallback');
             this.cardBackLoaded = false;
-            this.renderCards();
+            this.updateCardBacks();
         };
+
+        // Предзагрузка фона
+        const bgImage = new Image();
+        bgImage.src = 'images/background.jpg';
+        bgImage.onload = () => console.log('✅ Фон загружен');
+        bgImage.onerror = () => console.warn('❌ Фон не загружен, используем градиент');
+    }
+
+    updateCardBacks() {
+        const cardBacks = document.querySelectorAll('.card-back');
+        cardBacks.forEach(back => {
+            if (!this.cardBackLoaded) {
+                back.classList.add('fallback');
+            } else {
+                back.classList.remove('fallback');
+            }
+        });
     }
 
     getQuestionFromUrl() {
@@ -552,12 +570,14 @@ class TarotApp {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
             
+            const cardBackClass = this.cardBackLoaded ? '' : 'fallback';
+            
             cardElement.innerHTML = `
                 <div class="card-inner">
-                    <div class="card-back"></div>
+                    <div class="card-back ${cardBackClass}"></div>
                     <div class="card-front">
-                        <img src="${card.image}" alt="${card.name}" class="card-image" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.style.height='100%';">
+                        <img src="${card.image}" alt="${card.name}" class="card-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.padding='15px';">
                         <div class="card-info">
                             <div class="card-name">${this.getShortName(card.name)}</div>
                             <div class="card-meaning">${card.meaning}</div>
@@ -703,4 +723,3 @@ class TarotApp {
 document.addEventListener('DOMContentLoaded', () => {
     new TarotApp();
 });
-

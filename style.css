@@ -6,11 +6,10 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-image: url('images/background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: 
+        url('images/background.jpg') center/cover fixed,
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-blend-mode: overlay;
     min-height: 100vh;
     padding: 20px;
     color: white;
@@ -25,7 +24,7 @@ body::before {
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    z-index: -1;
+    z-index: -2;
 }
 
 .container {
@@ -99,6 +98,7 @@ body::before {
     height: 100%;
     transition: transform 0.6s ease;
     transform-style: preserve-3d;
+    border-radius: 12px;
 }
 
 .card.flipped .card-inner {
@@ -114,20 +114,15 @@ body::before {
     overflow: hidden;
 }
 
-/* ИСПРАВЛЕННАЯ РУБАШКА КАРТ */
+/* ИСПРАВЛЕННАЯ РУБАШКА КАРТ - ЛОКАЛЬНЫЙ ФОН */
 .card-back {
-    background: #1a1a1a;
-    border: 3px solid #8B4513;
+    background: 
+        url('images/card_back.jpg') center/cover,
+        linear-gradient(45deg, #8B4513, #A0522D);
+    border: 3px solid #D2B48C;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.card-back-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
 }
 
 /* Fallback если рубашка не загрузится */
@@ -137,11 +132,25 @@ body::before {
     color: rgba(255,255,255,0.7);
     position: absolute;
     z-index: 1;
+    opacity: 0.6;
+}
+
+/* Декоративный элемент для рубашки */
+.card-back::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 2px solid rgba(210, 180, 140, 0.5);
+    border-radius: 6px;
+    pointer-events: none;
 }
 
 /* ЛИЦЕВАЯ СТОРОНА КАРТЫ */
 .card-front {
-    background: #f5f7fa;
+    background: linear-gradient(135deg, #F5F5DC, #DEB887);
     transform: rotateY(180deg);
     display: flex;
     flex-direction: column;
@@ -152,25 +161,21 @@ body::before {
 /* ИЗОБРАЖЕНИЕ КАРТЫ */
 .card-image {
     width: 100%;
-    height: 100%;
+    height: 120px;
     object-fit: cover;
+    border-bottom: 2px solid #8B4513;
 }
 
 /* ИНФОРМАЦИЯ О КАРТЕ */
 .card-info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.9));
-    color: white;
-    padding: 10px 8px;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-}
-
-.card.flipped .card-info {
-    transform: translateY(0);
+    padding: 8px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    margin: 5px;
+    border-radius: 6px;
 }
 
 .card-name {
@@ -178,13 +183,14 @@ body::before {
     font-weight: bold;
     margin-bottom: 4px;
     text-align: center;
+    color: #2F4F4F;
 }
 
 .card-meaning {
     font-size: 10px;
     line-height: 1.2;
     text-align: center;
-    opacity: 0.9;
+    color: #696969;
 }
 
 /* ВЫБРАННАЯ КАРТА */
@@ -220,11 +226,12 @@ body::before {
 
 .selected-card-item {
     background: rgba(255,255,255,0.9);
-    color: #333;
+    color: #2F4F4F;
     padding: 8px 12px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: bold;
+    border: 1px solid #D2B48C;
 }
 
 .actions {
@@ -247,13 +254,15 @@ body::before {
 
 .submit-btn {
     background: linear-gradient(45deg, #FFD700, #FFA500);
-    color: #333;
+    color: #2F4F4F;
+    border: 2px solid #D2B48C;
 }
 
 .submit-btn:disabled {
     background: #666;
     color: #999;
     cursor: not-allowed;
+    border: 2px solid #999;
 }
 
 .submit-btn:not(:disabled):hover {
@@ -298,6 +307,25 @@ body::before {
     z-index: 10;
 }
 
+/* СКРОЛЛБАР ДЛЯ ГОРИЗОНТАЛЬНОГО КОНТЕЙНЕРА */
+.cards-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.cards-container::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+.cards-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+
+.cards-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
 /* Адаптивность для мобильных */
 @media (max-width: 480px) {
     .cards-container {
@@ -311,6 +339,10 @@ body::before {
         min-width: 100px;
     }
     
+    .card-image {
+        height: 100px;
+    }
+    
     .selected-card-item {
         font-size: 12px;
         padding: 6px 10px;
@@ -322,5 +354,41 @@ body::before {
     
     .card-meaning {
         font-size: 9px;
+    }
+    
+    .header h1 {
+        font-size: 20px;
+    }
+    
+    .question {
+        font-size: 13px;
+        padding: 12px;
+    }
+}
+
+/* Дополнительные улучшения для карт */
+.card:active {
+    transform: scale(0.95);
+}
+
+/* Индикатор загрузки для карт */
+.card.loading .card-back::before {
+    content: "⏳";
+    font-size: 30px;
+}
+
+/* Плавное появление карт */
+.card {
+    animation: cardAppear 0.5s ease;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

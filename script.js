@@ -495,7 +495,7 @@ class TarotApp {
         this.preloadCardBack();
         this.generateCards();
         this.setupEventListeners();
-        console.log('Tarot Mini App initialized');
+        console.log('Tarot Mini App initialized - Full Screen Cards');
     }
 
     preloadCardBack() {
@@ -505,11 +505,13 @@ class TarotApp {
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
             this.cardBackLoaded = true;
+            this.renderCards();
         };
         
         cardBackImage.onerror = () => {
             console.warn('❌ Не удалось загрузить рубашку карт');
             this.cardBackLoaded = false;
+            this.renderCards();
         };
     }
 
@@ -521,7 +523,9 @@ class TarotApp {
 
     renderQuestion() {
         const questionElement = document.getElementById('questionText');
-        questionElement.textContent = this.question;
+        if (questionElement) {
+            questionElement.textContent = this.question;
+        }
     }
 
     generateCards() {
@@ -540,6 +544,8 @@ class TarotApp {
 
     renderCards() {
         const container = document.getElementById('cardsContainer');
+        if (!container) return;
+        
         container.innerHTML = '';
 
         this.currentCards.forEach((card, index) => {
@@ -550,7 +556,8 @@ class TarotApp {
                 <div class="card-inner">
                     <div class="card-back"></div>
                     <div class="card-front">
-                        <img src="${card.image}" alt="${card.name}" class="card-image">
+                        <img src="${card.image}" alt="${card.name}" class="card-image" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.style.height='100%';">
                         <div class="card-info">
                             <div class="card-name">${this.getShortName(card.name)}</div>
                             <div class="card-meaning">${card.meaning}</div>
@@ -572,6 +579,8 @@ class TarotApp {
 
     toggleCard(card, index) {
         const cardElement = document.querySelectorAll('.card')[index];
+        if (!cardElement) return;
+        
         const isSelected = this.selectedCards.some(c => c.name === card.name);
 
         if (isSelected) {
@@ -613,7 +622,12 @@ class TarotApp {
             resultsContainer = document.createElement('div');
             resultsContainer.id = 'resultsContainer';
             resultsContainer.className = 'results-container';
-            document.querySelector('.container').appendChild(resultsContainer);
+            const container = document.querySelector('.container');
+            if (container) {
+                const actions = document.querySelector('.actions');
+                container.insertBefore(resultsContainer, actions);
+            }
+            return;
         }
 
         if (this.selectedCards.length > 0) {

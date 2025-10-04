@@ -242,7 +242,7 @@ const TAROT_DECK = [
     { 
         name: "4 Кубков", 
         meaning: "Апатия, созерцание, отступление", 
-        image: "images/icups04.jpg",
+        image: "images/cups04.jpg",
         type: "cups"
     },
     { 
@@ -703,3 +703,4 @@ class TarotApp {
 document.addEventListener('DOMContentLoaded', () => {
     new TarotApp();
 });
+

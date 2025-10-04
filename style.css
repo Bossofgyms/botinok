@@ -1,0 +1,312 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: white;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.question {
+    background: rgba(255,255,255,0.2);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 15px 0;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    line-height: 1.4;
+}
+
+.deck-selector {
+    margin: 15px 0;
+    text-align: center;
+}
+
+.deck-selector select {
+    background: rgba(255,255,255,0.9);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.counter {
+    font-size: 16px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    padding: 8px 20px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card {
+    aspect-ratio: 2/3;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    perspective: 1000px;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+/* СТИЛЬ РУБАШКИ КАРТ С ЛОКАЛЬНЫМ ИЗОБРАЖЕНИЕМ */
+.card-back {
+    background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+    border: 3px solid #8B4513;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-back::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('images/card_back.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+}
+
+/* Fallback если изображение не загрузится */
+.card-back::after {
+    content: "🎴";
+    font-size: 24px;
+    opacity: 0.3;
+    position: relative;
+    z-index: 1;
+}
+
+/* СТИЛЬ ЛИЦЕВОЙ СТОРОНЫ */
+.card-front {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    transform: rotateY(180deg);
+    text-align: center;
+    color: #333;
+    justify-content: space-between;
+    position: relative;
+    border: 2px solid #8B4513;
+}
+
+.card.selected {
+    box-shadow: 0 0 25px rgba(255,215,0,0.7);
+}
+
+.card-image {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    margin: 5px 0;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.9);
+    padding: 3px;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.card-emoji {
+    font-size: 35px;
+    margin: 5px 0;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.9);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.card-name {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: #2c3e50;
+    line-height: 1.2;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-meaning {
+    font-size: 9px;
+    color: #666;
+    line-height: 1.1;
+    max-height: 25px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.card-type {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 10px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+/* Цвета для типов карт */
+.card-type.major { background: gold; color: #333; }
+.card-type.wands { background: #ff6b6b; color: white; }
+.card-type.cups { background: #4ecdc4; color: white; }
+.card-type.swords { background: #45b7d1; color: white; }
+.card-type.pentacles { background: #96ceb4; color: #333; }
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.submit-btn, .shuffle-btn {
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #333;
+}
+
+.submit-btn:disabled {
+    background: #666;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,215,0,0.4);
+}
+
+.shuffle-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.shuffle-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.instructions {
+    text-align: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    line-height: 1.4;
+}
+
+/* Анимация при наведении на карту */
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card:hover .card-back::before {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Анимация выбора карты */
+@keyframes selectCard {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.card.selected {
+    animation: selectCard 0.3s ease;
+}
+
+.deck-info {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin: 5px 0;
+}
+
+/* Индикатор загрузки */
+.card-back.loading::before {
+    opacity: 0.7;
+}
+
+.card-back.loading::after {
+    content: "🔄";
+    font-size: 20px;
+    opacity: 0.8;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таро Расклад</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎴 Выберите 3 карты</h1>
+            <div class="question" id="questionText">Загрузка вопроса...</div>
+            <div class="counter">
+                Выбрано: <span id="selectedCount">0</span>/3 карт
+            </div>
+        </div>
+
+        <div class="cards-grid" id="cardsContainer">
+            <!-- Карты будут добавлены через JavaScript -->
+        </div>
+
+        <div class="actions">
+            <button id="submitBtn" class="submit-btn" disabled>
+                🔮 Получить расклад
+            </button>
+            <button id="shuffleBtn" class="shuffle-btn">
+                🔄 Новые карты
+            </button>
+        </div>
+
+        <div class="instructions">
+            <p>💫 Нажмите на карты, чтобы перевернуть их и выбрать 3 карты для расклада</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

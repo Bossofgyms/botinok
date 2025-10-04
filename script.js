@@ -488,7 +488,13 @@ class TarotApp {
         this.deckType = 'full';
         this.cardBackLoaded = false;
         this.backgroundLoaded = false;
+        this.isMobile = this.detectMobile();
         this.init();
+    }
+
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               window.innerWidth <= 768;
     }
 
     init() {
@@ -496,7 +502,16 @@ class TarotApp {
         this.preloadAssets();
         this.generateCards();
         this.setupEventListeners();
-        console.log('Tarot App initialized');
+        this.setupViewport();
+        console.log('Tarot App initialized - Mobile:', this.isMobile);
+    }
+
+    setupViewport() {
+        // Добавляем метатег viewport для лучшего отображения на мобильных
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
     }
 
     preloadAssets() {
@@ -515,6 +530,23 @@ class TarotApp {
             this.backgroundLoaded = false;
             document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
         };
+
+        // Предзагрузка рубашки карт
+        const cardBackImage = new Image();
+        cardBackImage.src = 'images/card_back.jpg';
+        
+        cardBackImage.onload = () => {
+            console.log('✅ Рубашка карт загружена');
+            this.cardBackLoaded = true;
+            this.updateCardBacks();
+        };
+        
+        cardBackImage.onerror = () => {
+            console.warn('❌ Рубашка карт не загружена, используем fallback');
+            this.cardBackLoaded = false;
+            this.updateCardBacks();
+        };
+    }
 
         // Предзагрузка рубашки карт
         const cardBackImage = new Image();
@@ -736,3 +768,4 @@ class TarotApp {
 document.addEventListener('DOMContentLoaded', () => {
     new TarotApp();
 });
+

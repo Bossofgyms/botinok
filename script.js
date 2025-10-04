@@ -548,23 +548,6 @@ class TarotApp {
         };
     }
 
-        // Предзагрузка рубашки карт
-        const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.jpg';
-        
-        cardBackImage.onload = () => {
-            console.log('✅ Рубашка карт загружена');
-            this.cardBackLoaded = true;
-            this.updateCardBacks();
-        };
-        
-        cardBackImage.onerror = () => {
-            console.warn('❌ Рубашка карт не загружена, используем fallback');
-            this.cardBackLoaded = false;
-            this.updateCardBacks();
-        };
-    }
-
     updateCardBacks() {
         const cardBacks = document.querySelectorAll('.card-back');
         cardBacks.forEach(back => {
@@ -710,7 +693,16 @@ class TarotApp {
     }
 
     showError(message) {
-        alert(message);
+        // Используем более красивое уведомление вместо alert
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.showPopup({
+                title: 'Внимание',
+                message: message,
+                buttons: [{ type: 'ok' }]
+            });
+        } else {
+            alert(message);
+        }
     }
 
     setupEventListeners() {
@@ -723,6 +715,39 @@ class TarotApp {
         if (shuffleBtn) {
             shuffleBtn.addEventListener('click', () => this.shuffleCards());
         }
+
+        // Добавляем обработчик для изменения ориентации
+        window.addEventListener('resize', () => {
+            this.handleResize();
+        });
+
+        // Предотвращаем масштабирование при двойном тапе на мобильных
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    }
+
+    handleResize() {
+        // Обновляем флаг мобильного устройства при изменении размера
+        this.isMobile = this.detectMobile();
+        
+        // Можно добавить дополнительную логику при изменении размера
+        if (window.innerHeight < 500) {
+            document.body.classList.add('landscape');
+        } else {
+            document.body.classList.remove('landscape');
+        }
     }
 
     submitCards() {
@@ -734,38 +759,107 @@ class TarotApp {
         const result = {
             question: this.question,
             cards: this.selectedCards.map(card => card.name),
-            deck_type: this.deckType
+            meanings: this.selectedCards.map(card => card.meaning),
+            deck_type: this.deckType,
+            timestamp: new Date().toISOString()
         };
 
         console.log('Отправка данных:', result);
 
         if (window.Telegram && window.Telegram.WebApp) {
+            // Для Telegram Web App
             window.Telegram.WebApp.sendData(JSON.stringify(result));
-            window.Telegram.WebApp.close();
+            // Показываем индикатор загрузки
+            window.Telegram.WebApp.showPopup({
+                title: 'Успешно',
+                message: 'Расклад отправлен!',
+                buttons: [{ type: 'ok' }]
+            });
+            setTimeout(() => {
+                window.Telegram.WebApp.close();
+            }, 1000);
         } else {
-            alert(`Расклад отправлен!\n\nВопрос: ${result.question}\nКарты: ${result.cards.join(', ')}`);
+            // Для браузера
+            const resultText = `Расклад отправлен!\n\nВопрос: ${result.question}\nКарты:\n${this.selectedCards.map((card, index) => `${index + 1}. ${card.name} - ${card.meaning}`).join('\n')}`;
+            
+            // Показываем красивое уведомление
+            if (window.confirm(resultText + '\n\nНажмите OK для продолжения')) {
+                // Можно добавить дополнительную логику для браузера
+                console.log('Расклад завершен');
+            }
         }
     }
 
     shuffleCards() {
-        this.selectedCards = [];
-        this.generateCards();
-        this.updateCounter();
-        this.updateSubmitButton();
-        this.updateResults();
-        
+        // Анимация перемешивания
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
-            card.style.animation = 'none';
+            card.style.transform = 'rotate(5deg)';
             setTimeout(() => {
-                card.style.animation = 'selectCard 0.5s ease';
-            }, 10);
+                card.style.transform = 'rotate(-5deg)';
+                setTimeout(() => {
+                    card.style.transform = 'rotate(0deg)';
+                }, 100);
+            }, 100);
         });
+
+        // Обновляем карты после небольшой задержки для анимации
+        setTimeout(() => {
+            this.selectedCards = [];
+            this.generateCards();
+            this.updateCounter();
+            this.updateSubmitButton();
+            this.updateResults();
+            
+            // Анимация появления новых карт
+            const newCards = document.querySelectorAll('.card');
+            newCards.forEach(card => {
+                card.style.animation = 'none';
+                setTimeout(() => {
+                    card.style.animation = 'selectCard 0.5s ease';
+                }, 10);
+            });
+        }, 300);
+    }
+
+    // Дополнительный метод для отладки
+    debugInfo() {
+        console.log('=== Tarot App Debug Info ===');
+        console.log('Selected cards:', this.selectedCards.length);
+        console.log('Current cards:', this.currentCards.length);
+        console.log('Question:', this.question);
+        console.log('Mobile:', this.isMobile);
+        console.log('Background loaded:', this.backgroundLoaded);
+        console.log('Card back loaded:', this.cardBackLoaded);
+        console.log('============================');
     }
 }
 
+// Добавляем глобальную функцию для отладки
+window.debugTarotApp = function() {
+    if (window.tarotApp) {
+        window.tarotApp.debugInfo();
+    }
+};
+
 // Запуск приложения
 document.addEventListener('DOMContentLoaded', () => {
-    new TarotApp();
+    window.tarotApp = new TarotApp();
+    
+    // Добавляем обработчик для ошибок загрузки изображений
+    window.addEventListener('error', (e) => {
+        if (e.target.tagName === 'IMG') {
+            console.warn('Ошибка загрузки изображения:', e.target.src);
+            e.target.style.display = 'none';
+        }
+    }, true);
 });
 
+// Обработчик для видимости страницы (пауза/возобновление)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        console.log('Приложение скрыто');
+    } else {
+        console.log('Приложение активно');
+    }
+});

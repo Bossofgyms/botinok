@@ -10,32 +10,36 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1> Выберите 3 карты</h1>
-            <div class="question" id="questionText">Загрузка вопроса...</div>
+            <h1>🎴 Таро Расклад</h1>
+            <div class="question">
+                <strong>Вопрос:</strong> <span id="questionText">Загрузка...</span>
+            </div>
             <div class="counter">
                 Выбрано: <span id="selectedCount">0</span>/3 карт
             </div>
         </div>
 
-        <div class="cards-grid" id="cardsContainer">
-            <!-- Карты будут добавлены через JavaScript -->
+        <div id="cardsContainer" class="cards-container">
+            <!-- Карты будут сгенерированы здесь -->
+        </div>
+
+        <div id="resultsContainer" class="results-container">
+            <!-- Результаты появятся здесь -->
         </div>
 
         <div class="actions">
             <button id="submitBtn" class="submit-btn" disabled>
-                🔮 Получить расклад
+                📨 Отправить расклад
             </button>
             <button id="shuffleBtn" class="shuffle-btn">
-                🔄 Новые карты
+                🔄 Перемешать карты
             </button>
         </div>
 
         <div class="instructions">
-            <p>💫 Нажмите на карты, чтобы перевернуть их и выбрать 3 карты для расклада</p>
+            💡 Выберите 3 карты для расклада. Нажмите на карту, чтобы перевернуть и выбрать.
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
-
 </html>

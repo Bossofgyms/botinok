@@ -242,7 +242,7 @@ const TAROT_DECK = [
     { 
         name: "4 Кубков", 
         meaning: "Апатия, созерцание, отступление", 
-        image: "images/cups04.jpg", // Исправлена опечатка в имени файла
+        image: "images/icups04.jpg",
         type: "cups"
     },
     { 
@@ -500,20 +500,16 @@ class TarotApp {
 
     preloadCardBack() {
         const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.jpg';
+        cardBackImage.src = 'images/card_back.png';
         
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
             this.cardBackLoaded = true;
-            // Обновляем отображение карт после загрузки рубашки
-            this.renderCards();
         };
         
         cardBackImage.onerror = () => {
             console.warn('❌ Не удалось загрузить рубашку карт');
             this.cardBackLoaded = false;
-            // Все равно рендерим карты - будет использован CSS fallback
-            this.renderCards();
         };
     }
 
@@ -525,9 +521,7 @@ class TarotApp {
 
     renderQuestion() {
         const questionElement = document.getElementById('questionText');
-        if (questionElement) {
-            questionElement.textContent = this.question;
-        }
+        questionElement.textContent = this.question;
     }
 
     generateCards() {
@@ -546,8 +540,6 @@ class TarotApp {
 
     renderCards() {
         const container = document.getElementById('cardsContainer');
-        if (!container) return;
-        
         container.innerHTML = '';
 
         this.currentCards.forEach((card, index) => {
@@ -558,8 +550,7 @@ class TarotApp {
                 <div class="card-inner">
                     <div class="card-back"></div>
                     <div class="card-front">
-                        <img src="${card.image}" alt="${card.name}" class="card-image" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.padding='20px 10px';">
+                        <img src="${card.image}" alt="${card.name}" class="card-image">
                         <div class="card-info">
                             <div class="card-name">${this.getShortName(card.name)}</div>
                             <div class="card-meaning">${card.meaning}</div>
@@ -581,8 +572,6 @@ class TarotApp {
 
     toggleCard(card, index) {
         const cardElement = document.querySelectorAll('.card')[index];
-        if (!cardElement) return;
-        
         const isSelected = this.selectedCards.some(c => c.name === card.name);
 
         if (isSelected) {
@@ -624,11 +613,7 @@ class TarotApp {
             resultsContainer = document.createElement('div');
             resultsContainer.id = 'resultsContainer';
             resultsContainer.className = 'results-container';
-            const container = document.querySelector('.container');
-            if (container) {
-                container.appendChild(resultsContainer);
-            }
-            return;
+            document.querySelector('.container').appendChild(resultsContainer);
         }
 
         if (this.selectedCards.length > 0) {
@@ -662,4 +647,45 @@ class TarotApp {
     }
 
     submitCards() {
-       
+        if (this.selectedCards.length !== 3) {
+            this.showError('Пожалуйста, выберите 3 карты');
+            return;
+        }
+
+        const result = {
+            question: this.question,
+            cards: this.selectedCards.map(card => card.name),
+            deck_type: this.deckType
+        };
+
+        console.log('Отправка данных:', result);
+
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.sendData(JSON.stringify(result));
+            window.Telegram.WebApp.close();
+        } else {
+            alert(`Расклад отправлен!\n\nВопрос: ${result.question}\nКарты: ${result.cards.join(', ')}`);
+        }
+    }
+
+    shuffleCards() {
+        this.selectedCards = [];
+        this.generateCards();
+        this.updateCounter();
+        this.updateSubmitButton();
+        this.updateResults();
+        
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.style.animation = 'none';
+            setTimeout(() => {
+                card.style.animation = 'selectCard 0.5s ease';
+            }, 10);
+        });
+    }
+}
+
+// Запуск приложения
+document.addEventListener('DOMContentLoaded', () => {
+    new TarotApp();
+});

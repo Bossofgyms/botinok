@@ -1,14 +1,176 @@
-/* Стили для информации о карте */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: 
+        url('images/background.jpg') center/cover fixed,
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-blend-mode: overlay;
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+}
+
+/* Fallback если фон не загрузится */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: -2;
+}
+
+.container {
+    max-width: 100vw;
+    margin: 0;
+    padding: 10px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.header h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.question {
+    background: rgba(255,255,255,0.2);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 10px 0;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    line-height: 1.4;
+}
+
+.counter {
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    padding: 6px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 8px 0;
+}
+
+/* КАРТЫ НА ВЕСЬ ЭКРАН БЕЗ ГРАНИЦ */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 5px 0;
+    width: 100vw;
+    margin-left: -10px;
+    margin-right: -10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.card {
+    width: calc(100vw / 3.5);
+    height: calc(100vw / 2.2);
+    min-width: calc(100vw / 3.5);
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    perspective: 1000px;
+    position: relative;
+    border: none;
+    margin: 0;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d;
+    border-radius: 0;
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 0;
+    overflow: hidden;
+    border: none;
+}
+
+/* РУБАШКА КАРТЫ НА ВЕСЬ ЭКРАН */
+.card-back {
+    background: 
+        url('images/card_back.png') center/cover,
+        linear-gradient(45deg, #8B4513, #A0522D);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+/* Fallback если рубашка не загрузится */
+.card-back::before {
+    content: "🎴";
+    font-size: 50px;
+    color: rgba(255,255,255,0.7);
+    position: absolute;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+/* ЛИЦЕВАЯ СТОРОНА КАРТЫ НА ВЕСЬ ЭКРАН */
+.card-front {
+    background: #000;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    border: none;
+    position: relative;
+}
+
+/* ИЗОБРАЖЕНИЕ КАРТЫ НА ВЕСЬ ЭКРАН */
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+}
+
+/* ИНФОРМАЦИЯ О КАРТЕ */
 .card-info {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
     color: white;
-    padding: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    padding: 12px 8px;
     transform: translateY(100%);
     transition: transform 0.3s ease;
 }
@@ -20,7 +182,7 @@
 .card-name {
     font-size: 14px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     text-align: center;
 }
 
@@ -31,15 +193,212 @@
     opacity: 0.9;
 }
 
-/* Убедитесь что изображение занимает всю карту */
-.card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
+/* ВЫБРАННАЯ КАРТА */
+.card.selected {
+    box-shadow: 0 0 30px rgba(255,215,0,0.8);
+    transform: translateY(-5px) scale(1.02);
 }
 
-.card-front {
-    position: relative;
-    overflow: hidden;
+/* КОНТЕЙНЕР ДЛЯ РЕЗУЛЬТАТОВ */
+.results-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    min-height: 60px;
+}
+
+.results-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.selected-cards {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.selected-card-item {
+    background: rgba(255,255,255,0.9);
+    color: #2F4F4F;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #D2B48C;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+.submit-btn, .shuffle-btn {
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.submit-btn {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #2F4F4F;
+}
+
+.submit-btn:disabled {
+    background: #666;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,215,0,0.4);
+}
+
+.shuffle-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.shuffle-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.instructions {
+    text-align: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    line-height: 1.4;
+}
+
+/* АНИМАЦИИ */
+.card:hover {
+    transform: translateY(-3px);
+}
+
+@keyframes selectCard {
+    0% { transform: translateY(-3px) scale(1); }
+    50% { transform: translateY(-8px) scale(1.03); }
+    100% { transform: translateY(-5px) scale(1.02); }
+}
+
+.card.selected {
+    animation: selectCard 0.3s ease;
+    z-index: 10;
+}
+
+/* СКРОЛЛБАР ДЛЯ ГОРИЗОНТАЛЬНОГО КОНТЕЙНЕРА */
+.cards-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.cards-container::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+}
+
+.cards-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+}
+
+.cards-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 480px) {
+    .cards-container {
+        gap: 6px;
+        padding: 5px 0;
+    }
+    
+    .card {
+        width: calc(100vw / 3.2);
+        height: calc(100vw / 2);
+        min-width: calc(100vw / 3.2);
+    }
+    
+    .selected-card-item {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .card-name {
+        font-size: 12px;
+    }
+    
+    .card-meaning {
+        font-size: 10px;
+    }
+    
+    .header h1 {
+        font-size: 18px;
+    }
+    
+    .question {
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .header {
+        padding: 12px;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 320px) {
+    .card {
+        width: calc(100vw / 2.8);
+        height: calc(100vw / 1.8);
+        min-width: calc(100vw / 2.8);
+    }
+}
+
+/* Дополнительные улучшения для карт */
+.card:active {
+    transform: scale(0.98);
+}
+
+/* Плавное появление карт */
+.card {
+    animation: cardAppear 0.5s ease;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Убираем все границы и тени для чистого вида */
+.card-back::after,
+.card-front::before,
+.card-front::after {
+    display: none;
 }

@@ -10,9 +10,12 @@ body {
         url('images/background.jpg') center/cover fixed,
         linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     background-blend-mode: overlay;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     min-height: 100vh;
     color: white;
-    padding: 20px;
+    padding: 15px;
 }
 
 /* Fallback если фон не загрузится */
@@ -30,28 +33,31 @@ body::before {
 .container {
     max-width: 100%;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     background: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 15px;
+    padding: 15px;
+    border-radius: 12px;
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .header h1 {
-    font-size: 24px;
-    margin-bottom: 15px;
+    font-size: 20px;
+    margin-bottom: 12px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .question {
     background: rgba(255,255,255,0.2);
-    padding: 15px;
-    border-radius: 12px;
-    margin: 15px 0;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
     font-size: 14px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.3);
@@ -59,38 +65,40 @@ body::before {
 }
 
 .counter {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     background: rgba(255,255,255,0.9);
     color: #333;
-    padding: 8px 20px;
+    padding: 6px 15px;
     border-radius: 20px;
     display: inline-block;
-    margin: 10px 0;
+    margin: 8px 0;
 }
 
 /* КОНТЕЙНЕР КАРТ */
 .cards-container {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-bottom: 25px;
+    gap: 10px;
+    margin-bottom: 20px;
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding: 10px 0;
+    padding: 8px 5px;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* СТАНДАРТНЫЙ РАЗМЕР КАРТ */
+/* РАЗМЕР КАРТ ДЛЯ МОБИЛЬНЫХ */
 .card {
-    width: 120px;
-    height: 200px;
-    min-width: 120px;
-    border-radius: 8px;
+    width: 95px;
+    height: 150px;
+    min-width: 95px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
     perspective: 1000px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .card-inner {
@@ -99,7 +107,7 @@ body::before {
     height: 100%;
     transition: transform 0.6s ease;
     transform-style: preserve-3d;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 .card.flipped .card-inner {
@@ -111,7 +119,7 @@ body::before {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
 }
 
@@ -133,7 +141,7 @@ body::before {
 
 .card-back.fallback::before {
     content: "🃏";
-    font-size: 40px;
+    font-size: 30px;
     color: rgba(255,255,255,0.7);
 }
 
@@ -146,22 +154,22 @@ body::before {
     border: 2px solid #8B4513;
 }
 
-/* ИЗОБРАЖЕНИЕ КАРТЫ - ЗАНИМАЕТ ВСЮ ПЛОЩАДЬ */
+/* ИЗОБРАЖЕНИЕ КАРТЫ */
 .card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* ИНФОРМАЦИЯ О КАРТЕ - ПОЛНОСТЬЮ ПРОЗРАЧНАЯ ПОВЕРХ КАРТЫ */
+/* ИНФОРМАЦИЯ О КАРТЕ */
 .card-info {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
     color: white;
-    padding: 10px 8px;
+    padding: 8px 6px;
     transform: translateY(100%);
     transition: transform 0.3s ease;
 }
@@ -171,75 +179,78 @@ body::before {
 }
 
 .card-name {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     text-align: center;
+    line-height: 1.2;
 }
 
 .card-meaning {
-    font-size: 10px;
-    line-height: 1.2;
+    font-size: 9px;
+    line-height: 1.1;
     text-align: center;
     opacity: 0.9;
 }
 
 /* ВЫБРАННАЯ КАРТА */
 .card.selected {
-    box-shadow: 0 0 20px rgba(255,215,0,0.8);
-    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(255,215,0,0.8);
+    transform: translateY(-3px);
 }
 
 /* КОНТЕЙНЕР РЕЗУЛЬТАТОВ */
 .results-container {
     background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 15px;
-    margin: 20px 0;
+    border-radius: 10px;
+    padding: 12px;
+    margin: 15px 0;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.2);
-    min-height: 60px;
+    min-height: 50px;
 }
 
 .results-title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     text-align: center;
 }
 
 .selected-cards {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .selected-card-item {
     background: rgba(255,255,255,0.9);
     color: #2F4F4F;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: bold;
 }
 
 .actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    max-width: 300px;
+    gap: 10px;
+    max-width: 100%;
     margin: 0 auto;
+    padding: 0 5px;
 }
 
 .submit-btn, .shuffle-btn {
-    padding: 16px;
+    padding: 14px;
     border: none;
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    width: 100%;
 }
 
 .submit-btn {
@@ -255,7 +266,7 @@ body::before {
 
 .submit-btn:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255,215,0,0.4);
+    box-shadow: 0 4px 12px rgba(255,215,0,0.4);
 }
 
 .shuffle-btn {
@@ -271,19 +282,19 @@ body::before {
 .instructions {
     text-align: center;
     color: rgba(255,255,255,0.8);
-    font-size: 12px;
-    margin-top: 20px;
-    padding: 15px;
+    font-size: 11px;
+    margin-top: 15px;
+    padding: 12px;
     background: rgba(0,0,0,0.2);
-    border-radius: 10px;
-    line-height: 1.4;
+    border-radius: 8px;
+    line-height: 1.3;
 }
 
 /* АНИМАЦИИ */
 @keyframes selectCard {
-    0% { transform: translateY(-5px) scale(1); }
-    50% { transform: translateY(-10px) scale(1.05); }
-    100% { transform: translateY(-5px) scale(1); }
+    0% { transform: translateY(-3px) scale(1); }
+    50% { transform: translateY(-6px) scale(1.03); }
+    100% { transform: translateY(-3px) scale(1); }
 }
 
 .card.selected {
@@ -292,40 +303,149 @@ body::before {
 
 /* СКРОЛЛБАР */
 .cards-container::-webkit-scrollbar {
-    height: 6px;
+    height: 4px;
 }
 
 .cards-container::-webkit-scrollbar-track {
     background: rgba(255,255,255,0.1);
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .cards-container::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,0.3);
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
-/* Адаптивность */
-@media (max-width: 480px) {
-    .cards-container {
-        gap: 10px;
+/* АДАПТИВНОСТЬ ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ */
+@media (max-width: 360px) {
+    body {
+        padding: 10px;
     }
     
+    .card {
+        width: 85px;
+        height: 135px;
+        min-width: 85px;
+    }
+    
+    .header {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .header h1 {
+        font-size: 18px;
+    }
+    
+    .question {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .counter {
+        font-size: 13px;
+        padding: 5px 12px;
+    }
+    
+    .card-name {
+        font-size: 10px;
+    }
+    
+    .card-meaning {
+        font-size: 8px;
+    }
+    
+    .submit-btn, .shuffle-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+/* АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ И БОЛЬШИХ ЭКРАНОВ */
+@media (min-width: 768px) {
+    .card {
+        width: 110px;
+        height: 170px;
+        min-width: 110px;
+    }
+    
+    .card-name {
+        font-size: 12px;
+    }
+    
+    .card-meaning {
+        font-size: 10px;
+    }
+    
+    .header h1 {
+        font-size: 26px;
+    }
+    
+    .question {
+        font-size: 16px;
+    }
+}
+
+/* ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ НА МОБИЛЬНЫХ */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+    }
+    
+    .header {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .header h1 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    
+    .question {
+        padding: 8px;
+        margin: 8px 0;
+        font-size: 13px;
+    }
+    
+    .card {
+        width: 80px;
+        height: 120px;
+        min-width: 80px;
+    }
+    
+    .card-name {
+        font-size: 9px;
+    }
+    
+    .card-meaning {
+        font-size: 8px;
+    }
+    
+    .instructions {
+        display: none; /* Скрываем инструкции в ландшафтном режиме */
+    }
+}
+
+/* ОПТИМИЗАЦИЯ ДЛЯ ВЫСОКИХ ЭКРАНОВ */
+@media (min-height: 800px) {
     .card {
         width: 100px;
         height: 160px;
         min-width: 100px;
     }
-    
-    .card-name {
-        font-size: 11px;
-    }
-    
-    .card-meaning {
-        font-size: 9px;
-    }
-    
-    body {
-        padding: 15px;
-    }
+}
+
+/* УЛУЧШЕНИЕ КАСАТЕЛЬНОЙ ПРОКРУТКИ НА iOS */
+.cards-container {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ПРЕДОТВРАЩЕНИЕ ВЫДЕЛЕНИЯ ТЕКСТА ПРИ КАСАНИИ */
+.card {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

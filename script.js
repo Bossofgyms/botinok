@@ -812,43 +812,40 @@ class TarotApp {
         }
     }
 
-    submitCards() {
-        if (this.selectedCards.length !== 3) {
-            this.showError('Пожалуйста, выберите 3 карты');
-            return;
-        }
+submitCards() {
+    if (this.selectedCards.length !== 3) {
+        this.showError('Пожалуйста, выберите 3 карты');
+        return;
+    }
 
-        const result = {
-            question: this.question,
-            cards: this.selectedCards.map(card => card.name),
-            meanings: this.selectedCards.map(card => card.meaning),
-            deck_type: this.deckType,
-            timestamp: new Date().toISOString()
-        };
+    const result = {
+        question: this.question,
+        cards: this.selectedCards.map(card => card.name),
+        meanings: this.selectedCards.map(card => card.meaning),
+        deck_type: this.deckType,
+        timestamp: new Date().toISOString()
+    };
 
-        console.log('DEBUG: Отправка данных:', result);
+    console.log('DEBUG: Отправка данных:', result);
 
-        if (window.Telegram && window.Telegram.WebApp) {
-            console.log('DEBUG: Telegram WebApp SDK доступен');
-            window.Telegram.WebApp.sendData(JSON.stringify(result));
-            console.log('✅ Данные отправлены через sendData');
-            window.Telegram.WebApp.showPopup({
-                title: 'Успешно',
-                message: 'Расклад отправлен!',
-                buttons: [{ type: 'ok' }]
-            });
-            setTimeout(() => {
-                window.Telegram.WebApp.close();
-            }, 1000);
-        } else {
-            console.log('❌ Telegram WebApp SDK недоступен');
-            const resultText = `Расклад отправлен!\n\nВопрос: ${result.question}\nКарты:\n${this.selectedCards.map((card, index) => `${index + 1}. ${card.name} - ${card.meaning}`).join('\n')}`;
-            
-            if (window.confirm(resultText + '\n\nНажмите OK для продолжения')) {
-                console.log('Расклад завершен');
-            }
+    if (window.Telegram && window.Telegram.WebApp) {
+        console.log('DEBUG: Telegram WebApp SDK доступен');
+        window.Telegram.WebApp.sendData(JSON.stringify(result));
+        console.log('✅ Данные отправлены через sendData');
+        // УБРАНО: window.Telegram.WebApp.showPopup(...)
+        console.log('Успешно: Расклад отправлен!');
+        setTimeout(() => {
+            window.Telegram.WebApp.close();
+        }, 1000);
+    } else {
+        console.log('❌ Telegram WebApp SDK недоступен');
+        const resultText = `Расклад отправлен!\n\nВопрос: ${result.question}\nКарты:\n${this.selectedCards.map((card, index) => `${index + 1}. ${card.name} - ${card.meaning}`).join('\n')}`;
+        
+        if (window.confirm(resultText + '\n\nНажмите OK для продолжения')) {
+            console.log('Расклад завершен');
         }
     }
+}
 
     shuffleCards() {
         const cards = document.querySelectorAll('.card');
@@ -945,3 +942,4 @@ document.addEventListener('visibilitychange', () => {
         window.tarotApp.updateCardBacks();
     }
 });
+

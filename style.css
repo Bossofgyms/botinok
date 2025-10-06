@@ -7,7 +7,7 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: 
-        url('images/back.jpg') center/cover fixed,
+        url('images/background.jpg') center/cover fixed,
         linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     background-blend-mode: overlay;
     min-height: 100vh;
@@ -116,7 +116,7 @@ body::before {
 
 .card-back {
     background: 
-        url('images/card_back.jpg') center/cover no-repeat,
+        url('images/back.jpg') center/cover no-repeat, /* изменён путь */
         #8B4513;
     border: 1px solid #D2B48C;
 }
@@ -437,4 +437,3 @@ body::before {
 .card, .card-inner, .card-front, .card-back {
     transition: all 0.3s ease;
 }
-

@@ -932,3 +932,4 @@ document.addEventListener('visibilitychange', () => {
         window.tarotApp.updateCardBacks();
     }
 });
+

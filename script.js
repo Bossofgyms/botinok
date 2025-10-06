@@ -657,29 +657,34 @@ class TarotApp {
         this.updateResults();
     }
 
-    createCardElement(card, index) {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'card';
-        
-        const cardBackClass = this.cardBackLoaded ? '' : 'fallback';
-        
-        cardElement.innerHTML = `
-            <div class="card-inner">
-                <div class="card-back ${cardBackClass}"></div>
-                <div class="card-front">
-                    <img src="${card.image}" alt="${card.name}" class="card-image"
-                         onerror="this.handleImageError(this)">
-                    <div class="card-info">
-                        <div class="card-name">${this.getShortName(card.name)}</div>
-                        <div class="card-meaning">${card.meaning}</div>
-                    </div>
+createCardElement(card, index) {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'card';
+    
+    const cardBackClass = this.cardBackLoaded ? '' : 'fallback';
+    
+    cardElement.innerHTML = `
+        <div class="card-inner">
+            <div class="card-back ${cardBackClass}"></div>
+            <div class="card-front">
+                <img src="${card.image}" alt="${card.name}" class="card-image">
+                <div class="card-info">
+                    <div class="card-name">${this.getShortName(card.name)}</div>
+                    <div class="card-meaning">${card.meaning}</div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
 
-        cardElement.addEventListener('click', () => this.toggleCard(card, index));
-        return cardElement;
+    // Заменяем onerror на addEventListener
+    const imgElement = cardElement.querySelector('.card-image');
+    if (imgElement) {
+        imgElement.addEventListener('error', () => this.handleImageError(imgElement));
     }
+
+    cardElement.addEventListener('click', () => this.toggleCard(card, index));
+    return cardElement;
+}
 
     handleImageError(imgElement) {
         imgElement.style.display = 'none';
@@ -942,4 +947,5 @@ document.addEventListener('visibilitychange', () => {
         window.tarotApp.updateCardBacks();
     }
 });
+
 

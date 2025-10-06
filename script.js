@@ -541,7 +541,7 @@ class TarotApp {
 
     loadBackground() {
         const bgImage = new Image();
-        bgImage.src = 'images/back.jpg'; // изменён путь
+        bgImage.src = 'images/back.jpg';
         
         bgImage.onload = () => {
             console.log('✅ Фон приложения загружен');
@@ -558,7 +558,7 @@ class TarotApp {
 
     applyBackground() {
         if (this.backgroundLoaded) {
-            document.body.style.backgroundImage = 'url("images/back.jpg")'; // изменён путь
+            document.body.style.backgroundImage = 'url("images/back.jpg")';
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundRepeat = 'no-repeat';
@@ -572,7 +572,7 @@ class TarotApp {
 
     loadCardBack() {
         const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.jpg'; // изменён путь
+        cardBackImage.src = 'images/card_back.jpg';
         
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
@@ -592,7 +592,7 @@ class TarotApp {
         cardBacks.forEach(back => {
             if (this.cardBackLoaded) {
                 back.classList.remove('fallback');
-                back.style.backgroundImage = 'url("images/card_back.jpg")'; // изменён путь
+                back.style.backgroundImage = 'url("images/card_back.jpg")';
                 back.style.backgroundSize = 'cover';
                 back.style.backgroundPosition = 'center';
                 back.style.backgroundRepeat = 'no-repeat';
@@ -817,10 +817,12 @@ class TarotApp {
             timestamp: new Date().toISOString()
         };
 
-        console.log('Отправка данных:', result);
+        console.log('DEBUG: Отправка данных:', result);
 
         if (window.Telegram && window.Telegram.WebApp) {
+            console.log('DEBUG: Telegram WebApp SDK доступен');
             window.Telegram.WebApp.sendData(JSON.stringify(result));
+            console.log('✅ Данные отправлены через sendData');
             window.Telegram.WebApp.showPopup({
                 title: 'Успешно',
                 message: 'Расклад отправлен!',
@@ -830,6 +832,7 @@ class TarotApp {
                 window.Telegram.WebApp.close();
             }, 1000);
         } else {
+            console.log('❌ Telegram WebApp SDK недоступен');
             const resultText = `Расклад отправлен!\n\nВопрос: ${result.question}\nКарты:\n${this.selectedCards.map((card, index) => `${index + 1}. ${card.name} - ${card.meaning}`).join('\n')}`;
             
             if (window.confirm(resultText + '\n\nНажмите OK для продолжения')) {
@@ -932,4 +935,3 @@ document.addEventListener('visibilitychange', () => {
         window.tarotApp.updateCardBacks();
     }
 });
-

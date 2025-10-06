@@ -585,7 +585,7 @@
 
             loadBackground() {
                 const bgImage = new Image();
-                bgImage.src = 'images/background.jpg';
+                bgImage.src = 'images/back.jpg'; // изменён путь
                 
                 bgImage.onload = () => {
                     console.log('✅ Фон приложения загружен');
@@ -602,7 +602,7 @@
 
             applyBackground() {
                 if (this.backgroundLoaded) {
-                    document.body.style.backgroundImage = 'url("images/background.jpg")';
+                    document.body.style.backgroundImage = 'url("images/back.jpg")'; // изменён путь
                     document.body.style.backgroundSize = 'cover';
                     document.body.style.backgroundPosition = 'center';
                     document.body.style.backgroundRepeat = 'no-repeat';
@@ -616,7 +616,7 @@
 
             loadCardBack() {
                 const cardBackImage = new Image();
-                cardBackImage.src = 'images/back.jpg'; // изменён путь
+                cardBackImage.src = 'images/card_back.jpg'; // изменён путь
                 
                 cardBackImage.onload = () => {
                     console.log('✅ Рубашка карт загружена');
@@ -636,7 +636,7 @@
                 cardBacks.forEach(back => {
                     if (this.cardBackLoaded) {
                         back.classList.remove('fallback');
-                        back.style.backgroundImage = 'url("images/back.jpg")'; // изменён путь
+                        back.style.backgroundImage = 'url("images/card_back.jpg")'; // изменён путь
                         back.style.backgroundSize = 'cover';
                         back.style.backgroundPosition = 'center';
                         back.style.backgroundRepeat = 'no-repeat';

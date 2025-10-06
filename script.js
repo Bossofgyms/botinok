@@ -572,7 +572,7 @@ class TarotApp {
 
     loadCardBack() {
         const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.jpg';
+        cardBackImage.src = 'images/back.jpg'; // изменён путь
         
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
@@ -592,7 +592,7 @@ class TarotApp {
         cardBacks.forEach(back => {
             if (this.cardBackLoaded) {
                 back.classList.remove('fallback');
-                back.style.backgroundImage = 'url("images/card_back.jpg")';
+                back.style.backgroundImage = 'url("images/back.jpg")'; // изменён путь
                 back.style.backgroundSize = 'cover';
                 back.style.backgroundPosition = 'center';
                 back.style.backgroundRepeat = 'no-repeat';

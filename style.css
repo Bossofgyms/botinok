@@ -292,39 +292,77 @@ body::before {
 /* Очень маленькие экраны */
 @media (max-width: 320px) {
     body { padding: 8px; }
-    .cards-container { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .card { width: 70px; height: 105px; }
-    .header { padding: 10px; margin-bottom: 10px; }
+    .cards-container { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 6px; 
+    }
+    .card { 
+        width: 70px; 
+        height: 105px; 
+    }
+    .header { 
+        padding: 10px; 
+        margin-bottom: 10px; 
+    }
     .header h1 { font-size: 16px; }
-    .question { padding: 8px; font-size: 12px; }
+    .question { 
+        padding: 8px; 
+        font-size: 12px; 
+    }
     .card-name { font-size: 8px; }
     .card-meaning { font-size: 6px; }
 }
 
 /* Средние мобильные */
 @media (min-width: 321px) and (max-width: 375px) {
-    .cards-container { grid-template-columns: repeat(4, 1fr); }
-    .card { width: 72px; height: 108px; }
+    .cards-container { 
+        grid-template-columns: repeat(4, 1fr); 
+        justify-content: center;
+    }
+    .card { 
+        width: 72px; 
+        height: 108px; 
+    }
 }
 
 /* Большие мобильные */
 @media (min-width: 376px) and (max-width: 425px) {
-    .cards-container { grid-template-columns: repeat(4, 1fr); }
-    .card { width: 78px; height: 117px; }
+    .cards-container { 
+        grid-template-columns: repeat(4, 1fr); 
+        justify-content: center;
+    }
+    .card { 
+        width: 78px; 
+        height: 117px; 
+    }
 }
 
 /* Планшеты */
 @media (min-width: 426px) and (max-width: 767px) {
-    .cards-container { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .card { width: 85px; height: 127px; }
+    .cards-container { 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 10px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 85px; 
+        height: 127px; 
+    }
     .card-name { font-size: 10px; }
     .card-meaning { font-size: 8px; }
 }
 
 /* Десктоп */
 @media (min-width: 768px) {
-    .cards-container { grid-template-columns: repeat(7, 1fr); gap: 12px; }
-    .card { width: 100px; height: 150px; }
+    .cards-container { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 12px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 100px; 
+        height: 150px; 
+    }
     .card-name { font-size: 11px; }
     .card-meaning { font-size: 9px; }
     .header h1 { font-size: 22px; }
@@ -334,8 +372,15 @@ body::before {
 
 /* Большие десктопы */
 @media (min-width: 1024px) {
-    .cards-container { grid-template-columns: repeat(7, 1fr); gap: 15px; }
-    .card { width: 110px; height: 165px; }
+    .cards-container { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 15px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 110px; 
+        height: 165px; 
+    }
     .card-name { font-size: 12px; }
     .card-meaning { font-size: 10px; }
 }
@@ -343,16 +388,36 @@ body::before {
 /* Горизонтальная ориентация */
 @media (max-height: 500px) and (orientation: landscape) {
     body { padding: 5px; }
-    .cards-container { grid-template-columns: repeat(7, 1fr); gap: 5px; }
-    .card { width: 65px; height: 97px; }
-    .header { padding: 8px; margin-bottom: 8px; }
+    .cards-container { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 5px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 65px; 
+        height: 97px; 
+    }
+    .header { 
+        padding: 8px; 
+        margin-bottom: 8px; 
+    }
     .header h1 { font-size: 14px; }
-    .question { padding: 6px; margin: 5px 0; font-size: 11px; }
+    .question { 
+        padding: 6px; 
+        margin: 5px 0; 
+        font-size: 11px; 
+    }
     .card-name { font-size: 7px; }
     .card-meaning { font-size: 6px; }
     .instructions { display: none; }
-    .actions { flex-direction: row; gap: 8px; }
-    .submit-btn, .shuffle-btn { padding: 8px; font-size: 12px; }
+    .actions { 
+        flex-direction: row; 
+        gap: 8px; 
+    }
+    .submit-btn, .shuffle-btn { 
+        padding: 8px; 
+        font-size: 12px; 
+    }
 }
 
 /* Оптимизация для сенсорных устройств */

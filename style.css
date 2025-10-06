@@ -10,15 +10,11 @@ body {
         url('images/background.jpg') center/cover fixed,
         linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     background-blend-mode: overlay;
-    background-size: cover;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
     min-height: 100vh;
     color: white;
     padding: 10px;
 }
 
-/* Fallback если фон не загрузится */
 body::before {
     content: "";
     position: fixed;
@@ -75,7 +71,6 @@ body::before {
     margin: 6px 0;
 }
 
-/* КОНТЕЙНЕР КАРТ - 2 РЯДА ДЛЯ МОБИЛЬНЫХ */
 .cards-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -85,7 +80,6 @@ body::before {
     justify-items: center;
 }
 
-/* КОМПАКТНЫЙ РАЗМЕР КАРТ ДЛЯ МОБИЛЬНЫХ */
 .card {
     width: 75px;
     height: 115px;
@@ -95,7 +89,7 @@ body::before {
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     perspective: 800px;
     position: relative;
-    overflow: hidden; /* Убираем переполнение */
+    overflow: hidden;
 }
 
 .card-inner {
@@ -120,17 +114,13 @@ body::before {
     overflow: hidden;
 }
 
-/* РУБАШКА КАРТ - ЗАНИМАЕТ ВСЁ ПРОСТРАНСТВО */
 .card-back {
     background: 
         url('images/card_back.jpg') center/cover no-repeat,
         #8B4513;
     border: 1px solid #D2B48C;
-    background-size: cover !important; /* Принудительно растягиваем на всю площадь */
-    background-position: center !important;
 }
 
-/* Fallback если рубашка не загрузится */
 .card-back.fallback {
     background: linear-gradient(45deg, #8B4513, #A0522D) !important;
     display: flex;
@@ -144,7 +134,6 @@ body::before {
     color: rgba(255,255,255,0.7);
 }
 
-/* ЛИЦЕВАЯ СТОРОНА КАРТЫ - ИЗОБРАЖЕНИЕ ЗАНИМАЕТ ВСЁ ПРОСТРАНСТВО */
 .card-front {
     background: #000;
     transform: rotateY(180deg);
@@ -154,16 +143,14 @@ body::before {
     overflow: hidden;
 }
 
-/* ИЗОБРАЖЕНИЕ КАРТЫ - РАСТЯГИВАЕМ С ОБРЕЗКОЙ */
 .card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transform: scale(1.05); /* Небольшое увеличение чтобы скрыть края */
+    transform: scale(1.05);
 }
 
-/* ИНФОРМАЦИЯ О КАРТЕ - КОМПАКТНАЯ */
 .card-info {
     position: absolute;
     bottom: 0;
@@ -195,13 +182,11 @@ body::before {
     opacity: 0.9;
 }
 
-/* ВЫБРАННАЯ КАРТА */
 .card.selected {
     box-shadow: 0 0 12px rgba(255,215,0,0.8);
     transform: translateY(-2px);
 }
 
-/* КОНТЕЙНЕР РЕЗУЛЬТАТОВ */
 .results-container {
     background: rgba(255,255,255,0.1);
     border-radius: 8px;
@@ -292,7 +277,6 @@ body::before {
     line-height: 1.2;
 }
 
-/* АНИМАЦИИ */
 @keyframes selectCard {
     0% { transform: translateY(-2px) scale(1); }
     50% { transform: translateY(-4px) scale(1.02); }
@@ -303,207 +287,79 @@ body::before {
     animation: selectCard 0.3s ease;
 }
 
-/* АДАПТИВНОСТЬ ДЛЯ РАЗНЫХ РАЗМЕРОВ ЭКРАНОВ */
+/* === АДАПТИВНОСТЬ === */
 
-/* Очень маленькие экраны (до 320px) */
+/* Очень маленькие экраны */
 @media (max-width: 320px) {
-    body {
-        padding: 8px;
-    }
-    
-    .cards-container {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-    }
-    
-    .card {
-        width: 70px;
-        height: 105px;
-    }
-    
-    .header {
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .header h1 {
-        font-size: 16px;
-    }
-    
-    .question {
-        padding: 8px;
-        font-size: 12px;
-    }
-    
-    .card-name {
-        font-size: 8px;
-    }
-    
-    .card-meaning {
-        font-size: 6px;
-    }
+    body { padding: 8px; }
+    .cards-container { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .card { width: 70px; height: 105px; }
+    .header { padding: 10px; margin-bottom: 10px; }
+    .header h1 { font-size: 16px; }
+    .question { padding: 8px; font-size: 12px; }
+    .card-name { font-size: 8px; }
+    .card-meaning { font-size: 6px; }
 }
 
-/* Средние мобильные (321px - 375px) */
+/* Средние мобильные */
 @media (min-width: 321px) and (max-width: 375px) {
-    .cards-container {
-        grid-template-columns: repeat(4, 1fr);
-    }
-    
-    .card {
-        width: 72px;
-        height: 108px;
-    }
+    .cards-container { grid-template-columns: repeat(4, 1fr); }
+    .card { width: 72px; height: 108px; }
 }
 
-/* Большие мобильные (376px - 425px) */
+/* Большие мобильные */
 @media (min-width: 376px) and (max-width: 425px) {
-    .cards-container {
-        grid-template-columns: repeat(4, 1fr);
-    }
-    
-    .card {
-        width: 78px;
-        height: 117px;
-    }
+    .cards-container { grid-template-columns: repeat(4, 1fr); }
+    .card { width: 78px; height: 117px; }
 }
 
-/* Планшеты и маленькие ноутбуки (426px - 767px) */
+/* Планшеты */
 @media (min-width: 426px) and (max-width: 767px) {
-    .cards-container {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-    }
-    
-    .card {
-        width: 85px;
-        height: 127px;
-    }
-    
-    .card-name {
-        font-size: 10px;
-    }
-    
-    .card-meaning {
-        font-size: 8px;
-    }
+    .cards-container { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .card { width: 85px; height: 127px; }
+    .card-name { font-size: 10px; }
+    .card-meaning { font-size: 8px; }
 }
 
-/* Десктоп (768px+) */
+/* Десктоп */
 @media (min-width: 768px) {
-    .cards-container {
-        grid-template-columns: repeat(7, 1fr);
-        gap: 12px;
-    }
-    
-    .card {
-        width: 100px;
-        height: 150px;
-    }
-    
-    .card-name {
-        font-size: 11px;
-    }
-    
-    .card-meaning {
-        font-size: 9px;
-    }
-    
-    .header h1 {
-        font-size: 22px;
-    }
-    
-    .question {
-        font-size: 15px;
-    }
-    
-    body {
-        padding: 15px;
-    }
+    .cards-container { grid-template-columns: repeat(7, 1fr); gap: 12px; }
+    .card { width: 100px; height: 150px; }
+    .card-name { font-size: 11px; }
+    .card-meaning { font-size: 9px; }
+    .header h1 { font-size: 22px; }
+    .question { font-size: 15px; }
+    body { padding: 15px; }
 }
 
-/* Большие десктоп экраны (1024px+) */
+/* Большие десктопы */
 @media (min-width: 1024px) {
-    .cards-container {
-        grid-template-columns: repeat(7, 1fr);
-        gap: 15px;
-    }
-    
-    .card {
-        width: 110px;
-        height: 165px;
-    }
-    
-    .card-name {
-        font-size: 12px;
-    }
-    
-    .card-meaning {
-        font-size: 10px;
-    }
+    .cards-container { grid-template-columns: repeat(7, 1fr); gap: 15px; }
+    .card { width: 110px; height: 165px; }
+    .card-name { font-size: 12px; }
+    .card-meaning { font-size: 10px; }
 }
 
-/* ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ НА МОБИЛЬНЫХ */
+/* Горизонтальная ориентация */
 @media (max-height: 500px) and (orientation: landscape) {
-    body {
-        padding: 5px;
-    }
-    
-    .cards-container {
-        grid-template-columns: repeat(7, 1fr);
-        gap: 5px;
-    }
-    
-    .card {
-        width: 65px;
-        height: 97px;
-    }
-    
-    .header {
-        padding: 8px;
-        margin-bottom: 8px;
-    }
-    
-    .header h1 {
-        font-size: 14px;
-        margin-bottom: 5px;
-    }
-    
-    .question {
-        padding: 6px;
-        margin: 5px 0;
-        font-size: 11px;
-    }
-    
-    .card-name {
-        font-size: 7px;
-    }
-    
-    .card-meaning {
-        font-size: 6px;
-    }
-    
-    .instructions {
-        display: none;
-    }
-    
-    .actions {
-        flex-direction: row;
-        gap: 8px;
-    }
-    
-    .submit-btn, .shuffle-btn {
-        padding: 8px;
-        font-size: 12px;
-    }
+    body { padding: 5px; }
+    .cards-container { grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .card { width: 65px; height: 97px; }
+    .header { padding: 8px; margin-bottom: 8px; }
+    .header h1 { font-size: 14px; }
+    .question { padding: 6px; margin: 5px 0; font-size: 11px; }
+    .card-name { font-size: 7px; }
+    .card-meaning { font-size: 6px; }
+    .instructions { display: none; }
+    .actions { flex-direction: row; gap: 8px; }
+    .submit-btn, .shuffle-btn { padding: 8px; font-size: 12px; }
 }
 
-/* УЛУЧШЕНИЕ КАСАТЕЛЬНОЙ ПРОКРУТКИ НА iOS */
+/* Оптимизация для сенсорных устройств */
 .cards-container {
     -webkit-overflow-scrolling: touch;
 }
 
-/* ПРЕДОТВРАЩЕНИЕ ВЫДЕЛЕНИЯ ТЕКСТА ПРИ КАСАНИИ */
 .card {
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
@@ -512,7 +368,7 @@ body::before {
     user-select: none;
 }
 
-/* ПЛАВНЫЕ ПЕРЕХОДЫ */
+/* Плавные переходы */
 .card, .card-inner, .card-front, .card-back {
     transition: all 0.3s ease;
 }

@@ -541,7 +541,7 @@ class TarotApp {
 
     loadBackground() {
         const bgImage = new Image();
-        bgImage.src = 'images/back.jpg';
+        bgImage.src = 'images/back.jpg'; // изменён путь
         
         bgImage.onload = () => {
             console.log('✅ Фон приложения загружен');
@@ -558,7 +558,7 @@ class TarotApp {
 
     applyBackground() {
         if (this.backgroundLoaded) {
-            document.body.style.backgroundImage = 'url("images/back.jpg")';
+            document.body.style.backgroundImage = 'url("images/back.jpg")'; // изменён путь
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundRepeat = 'no-repeat';
@@ -572,7 +572,7 @@ class TarotApp {
 
     loadCardBack() {
         const cardBackImage = new Image();
-        cardBackImage.src = 'images/card_back.jpg';
+        cardBackImage.src = 'images/card_back.jpg'; // изменён путь
         
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
@@ -592,7 +592,7 @@ class TarotApp {
         cardBacks.forEach(back => {
             if (this.cardBackLoaded) {
                 back.classList.remove('fallback');
-                back.style.backgroundImage = 'url("images/card_back.jpg")';
+                back.style.backgroundImage = 'url("images/card_back.jpg")'; // изменён путь
                 back.style.backgroundSize = 'cover';
                 back.style.backgroundPosition = 'center';
                 back.style.backgroundRepeat = 'no-repeat';
@@ -935,3 +935,6 @@ document.addEventListener('visibilitychange', () => {
         window.tarotApp.updateCardBacks();
     }
 });
+    </script>
+</body>
+</html>

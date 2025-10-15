@@ -105,7 +105,7 @@ class TarotApp {
     }
 
     detectMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
                window.innerWidth <= 768;
     }
 
@@ -123,18 +123,19 @@ class TarotApp {
         this.preloadAssets();
         this.generateCards();
         this.setupEventListeners();
-        this.setupViewport();
+        // УБРАНО setupViewport, так как теперь viewport не скрывает интерфейс
+        // this.setupViewport();
         this.updateLayout();
         console.log('Tarot App initialized - Mobile:', this.isMobile, 'Screen:', this.screenSize);
     }
 
-    setupViewport() {
-        const viewport = document.querySelector('meta[name="viewport"]');
-        if (viewport) {
-            // Возвращаем user-scalable=no и maximum-scale=1.0
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-        }
-    }
+    // УБРАНА функция setupViewport, так как теперь viewport не скрывает интерфейс
+    // setupViewport() {
+    //     const viewport = document.querySelector('meta[name="viewport"]');
+    //     if (viewport) {
+    //         viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    //     }
+    // }
 
     updateLayout() {
         document.body.className = '';
@@ -142,7 +143,7 @@ class TarotApp {
         if (this.isMobile) {
             document.body.classList.add('mobile');
         }
-        
+
         this.renderCards();
     }
 
@@ -154,13 +155,13 @@ class TarotApp {
     loadBackground() {
         const bgImage = new Image();
         bgImage.src = 'images/back.jpg';
-        
+
         bgImage.onload = () => {
             console.log('✅ Фон приложения загружен');
             this.backgroundLoaded = true;
             this.applyBackground();
         };
-        
+
         bgImage.onerror = () => {
             console.warn('❌ Фон приложения не загружен, используем градиент');
             this.backgroundLoaded = false;
@@ -186,13 +187,13 @@ class TarotApp {
     loadCardBack() {
         const cardBackImage = new Image();
         cardBackImage.src = 'images/card_back.jpg';
-        
+
         cardBackImage.onload = () => {
             console.log('✅ Рубашка карт загружена');
             this.cardBackLoaded = true;
             this.updateCardBacks();
         };
-        
+
         cardBackImage.onerror = () => {
             console.warn('❌ Рубашка карт не загружена, используем fallback');
             this.cardBackLoaded = false;
@@ -228,13 +229,13 @@ class TarotApp {
 
     generateCards() {
         let availableCards = [];
-        
+
         if (this.deckType === 'major') {
             availableCards = TAROT_DECK.filter(card => card.type === 'major');
         } else {
             availableCards = [...TAROT_DECK];
         }
-        
+
         const shuffled = availableCards.sort(() => Math.random() - 0.5);
         this.currentCards = shuffled.slice(0, 7);
         this.renderCards();
@@ -246,7 +247,7 @@ class TarotApp {
             console.error("❌ #cardsContainer не найден");
             return;
         }
-        
+
         container.innerHTML = '';
 
         this.currentCards.forEach((card, index) => {
@@ -257,7 +258,7 @@ class TarotApp {
                 console.error("❌ cardElement не создан для", card);
             }
         });
-        
+
         // Обновляем рубашки после рендеринга
         this.updateCardBacks();
         this.updateResults();
@@ -269,7 +270,7 @@ class TarotApp {
         cardElement.dataset.cardName = card.name; // Уникальный идентификатор
 
         const cardBackClass = this.cardBackLoaded ? '' : 'fallback';
-        
+
         cardElement.innerHTML = `
             <div class="card-inner">
                 <div class="card-back ${cardBackClass}"></div>
@@ -315,7 +316,7 @@ class TarotApp {
     toggleCard(card) {
         const isSelected = this.selectedCards.some(c => c.name === card.name);
         const cardElement = document.querySelector(`.card[data-card-name="${CSS.escape(card.name)}"]`);
-        
+
         if (!cardElement) return;
 
         if (isSelected) {
@@ -353,10 +354,10 @@ class TarotApp {
     updateResults() {
         const resultsContainer = document.getElementById('resultsContainer');
         const list = document.getElementById('selectedCardsList');
-        
+
         if (this.selectedCards.length > 0) {
             resultsContainer.style.display = 'block';
-            list.innerHTML = this.selectedCards.map(card => 
+            list.innerHTML = this.selectedCards.map(card =>
                 `<div class="selected-card-item">${this.getShortName(card.name)}</div>`
             ).join('');
         } else {
@@ -379,7 +380,7 @@ class TarotApp {
     setupEventListeners() {
         const submitBtn = document.getElementById('submitBtn');
         const shuffleBtn = document.getElementById('shuffleBtn');
-        
+
         if (submitBtn) {
             submitBtn.addEventListener('click', () => this.submitCards());
         }
@@ -411,11 +412,11 @@ class TarotApp {
         const oldScreenSize = this.screenSize;
         this.screenSize = this.getScreenSize();
         this.isMobile = this.detectMobile();
-        
+
         if (oldScreenSize !== this.screenSize) {
             this.updateLayout();
         }
-        
+
         if (window.innerHeight < 500) {
             document.body.classList.add('landscape');
         } else {
@@ -441,9 +442,9 @@ class TarotApp {
 
         if (window.Telegram && window.Telegram.WebApp) {
             console.log('DEBUG: Telegram WebApp SDK доступен');
-            console.log('DEBUG: WebApp init_', window.Telegram.WebApp.init_data); // Исправлено имя свойства
-            console.log('DEBUG: WebApp version:', window.Telegram.WebApp.version); // Лог версии
-            console.log('DEBUG: WebApp isReady:', window.Telegram.WebApp.isReady); // Лог статуса готовности
+            console.log('DEBUG: WebApp init_data:', window.Telegram.WebApp.init_data);
+            console.log('DEBUG: WebApp version:', window.Telegram.WebApp.version);
+            console.log('DEBUG: WebApp isReady:', window.Telegram.WebApp.isReady);
 
             // ВАЖНО: Вызовите WebApp.ready() перед sendData
             window.Telegram.WebApp.ready();
@@ -466,7 +467,7 @@ class TarotApp {
         } else {
             console.log('❌ Telegram WebApp SDK недоступен');
             const resultText = `Расклад отправлен!\n\nВопрос: ${result.question}\nКарты:\n${this.selectedCards.map((card, index) => `${index + 1}. ${card.name} - ${card.meaning}`).join('\n')}`;
-            
+
             if (window.confirm(resultText + '\n\nНажмите OK для продолжения')) {
                 console.log('Расклад завершен');
             }
@@ -475,7 +476,7 @@ class TarotApp {
 
     shuffleCards() {
         const cards = document.querySelectorAll('.card');
-        
+
         // Анимация тасования
         cards.forEach((card, index) => {
             setTimeout(() => {
@@ -497,7 +498,7 @@ class TarotApp {
             this.updateCounter();
             this.updateSubmitButton();
             this.updateResults();
-            
+
             const newCards = document.querySelectorAll('.card');
             newCards.forEach(card => {
                 card.style.animation = 'none';
@@ -533,20 +534,20 @@ class TarotApp {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DEBUG: DOMContentLoaded");
     window.tarotApp = new TarotApp();
-    
+
     // Глобальные функции для отладки
     window.reloadBackground = function() {
         if (window.tarotApp) {
             window.tarotApp.reloadBackground();
         }
     };
-    
+
     window.reloadCardBack = function() {
         if (window.tarotApp) {
             window.tarotApp.reloadCardBack();
         }
     };
-    
+
     window.debugTarot = function() {
         if (window.tarotApp) {
             window.tarotApp.debugInfo();

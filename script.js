@@ -440,7 +440,7 @@ class TarotApp {
 
         if (window.Telegram && window.Telegram.WebApp) {
             console.log('DEBUG: Telegram WebApp SDK доступен');
-            console.log('DEBUG: WebApp init_data:', window.Telegram.WebApp.initData); // Лог initData
+            console.log('DEBUG: WebApp init_data:', window.Telegram.WebApp.init_data); // Исправлено имя свойства
             console.log('DEBUG: WebApp version:', window.Telegram.WebApp.version); // Лог версии
             console.log('DEBUG: WebApp isReady:', window.Telegram.WebApp.isReady); // Лог статуса готовности
 

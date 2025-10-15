@@ -440,9 +440,22 @@ class TarotApp {
 
         if (window.Telegram && window.Telegram.WebApp) {
             console.log('DEBUG: Telegram WebApp SDK доступен');
-            window.Telegram.WebApp.sendData(JSON.stringify(result));
-            console.log('✅ Данные отправлены через sendData');
-            
+            console.log('DEBUG: WebApp init_data:', window.Telegram.WebApp.initData); // Лог initData
+            console.log('DEBUG: WebApp version:', window.Telegram.WebApp.version); // Лог версии
+            console.log('DEBUG: WebApp isReady:', window.Telegram.WebApp.isReady); // Лог статуса готовности
+
+            // ВАЖНО: Вызовите WebApp.ready() перед sendData
+            window.Telegram.WebApp.ready();
+
+            try {
+                window.Telegram.WebApp.sendData(JSON.stringify(result));
+                console.log('✅ Данные отправлены через sendData');
+            } catch (error) {
+                 console.error('❌ Ошибка при отправке данных:', error);
+                 this.showError('Ошибка при отправке данных. Попробуйте снова.');
+                 return; // Прервать выполнение, если ошибка
+            }
+
             // Закрываем через 1.5 секунды
             setTimeout(() => {
                 if (window.Telegram?.WebApp) {

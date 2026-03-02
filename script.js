@@ -88,39 +88,6 @@ const TAROT_DECK = [
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
 
-const TAROT_DECK = [
-    // СТАРШИЕ АРКАНЫ
-    { name: "0. Шут", meaning: "Начало, невинность", image: "images/fool.jpg" },
-    { name: "I. Маг", meaning: "Воля, мастерство", image: "images/magician.jpg" },
-    { name: "II. Жрица", meaning: "Интуиция, тайны", image: "images/high_priestess.jpg" },
-    { name: "III. Императрица", meaning: "Изобилие, творчество", image: "images/empress.jpg" },
-    { name: "IV. Император", meaning: "Власть, структура", image: "images/emperor.jpg" },
-    { name: "V. Иерофант", meaning: "Традиция, вера", image: "images/hierophant.jpg" },
-    { name: "VI. Влюбленные", meaning: "Выбор, гармония", image: "images/lovers.jpg" },
-    { name: "VII. Колесница", meaning: "Движение, победа", image: "images/chariot.jpg" },
-    { name: "VIII. Сила", meaning: "Мужество, страсть", image: "images/strength.jpg" },
-    { name: "IX. Отшельник", meaning: "Самоанализ, мудрость", image: "images/hermit.jpg" },
-    { name: "X. Колесо Фортуны", meaning: "Судьба, удача", image: "images/wheel.jpg" },
-    { name: "XI. Справедливость", meaning: "Баланс, правда", image: "images/justice.jpg" },
-    { name: "XII. Повешенный", meaning: "Жертва, сдача", image: "images/hanged.jpg" },
-    { name: "XIII. Смерть", meaning: "Трансформация", image: "images/death.jpg" },
-    { name: "XIV. Умеренность", meaning: "Баланс, терпение", image: "images/temperance.jpg" },
-    { name: "XV. Дьявол", meaning: "Искушение, зависимость", image: "images/devil.jpg" },
-    { name: "XVI. Башня", meaning: "Внезапные изменения", image: "images/tower.jpg" },
-    { name: "XVII. Звезда", meaning: "Надежда, вдохновение", image: "images/star.jpg" },
-    { name: "XVIII. Луна", meaning: "Иллюзия, страх", image: "images/moon.jpg" },
-    { name: "XIX. Солнце", meaning: "Радость, успех", image: "images/sun.jpg" },
-    { name: "XX. Суд", meaning: "Возрождение, призыв", image: "images/judgement.jpg" },
-    { name: "XXI. Мир", meaning: "Завершение, единство", image: "images/world.jpg" },
-
-    // МЛАДШИЕ АРКАНЫ (примеры)
-    { name: "Туз Жезлов", meaning: "Вдохновение", image: "images/wands01.jpg" },
-    { name: "2 Кубков", meaning: "Партнерство", image: "images/cups02.jpg" },
-    { name: "3 Мечей", meaning: "Боль, печаль", image: "images/swords03.jpg" },
-    { name: "4 Пентаклей", meaning: "Сохранение", image: "images/pents04.jpg" },
-    { name: "5 Жезлов", meaning: "Конфликт", image: "images/wands05.jpg" }
-];
-
 class TarotApp {
     constructor() {
         this.selectedCards = [];
@@ -356,3 +323,4 @@ class TarotApp {
 document.addEventListener('DOMContentLoaded', () => {
     window.tarotApp = new TarotApp();
 });
+

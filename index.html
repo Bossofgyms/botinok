@@ -96,7 +96,7 @@
 
         .cards-container {
             display: flex;
-            gap: 15px;
+            gap: 15px;                    /* РАВНОУДАЛЁННЫЕ КАРТЫ */
             padding: 10px;
             min-width: fit-content;
             justify-content: center;
@@ -105,12 +105,13 @@
 
         /* === КАРТА С РУБАШКОЙ === */
         .card {
-            width: 80px;
-            height: 130px;
-            perspective: 1000px;
+            width: 80px;                   /* ФИКСИРОВАННАЯ ШИРИНА */
+            height: 130px;                 /* ФИКСИРОВАННАЯ ВЫСОТА */
+            perspective: 1000px;           /* ДЛЯ 3D ПЕРЕВОРОТА */
             cursor: pointer;
             touch-action: manipulation;
             transition: transform 0.3s ease;
+            flex-shrink: 0;                /* Чтобы карты не сжимались */
         }
 
         .card-inner {
@@ -121,6 +122,7 @@
             transform-style: preserve-3d;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            will-change: transform;        /* Для производительности */
         }
 
         .card.flipped .card-inner { transform: rotateY(180deg); }
@@ -128,22 +130,22 @@
 
         .card-front, .card-back {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
+            width: 100%;                  /* ВАЖНО: на 100% размера родителя */
+            height: 100%;                 /* ВАЖНО: на 100% размера родителя */
+            backface-visibility: hidden;  /* Скрывает заднюю часть при перевороте */
             border-radius: 10px;
             overflow: hidden;
+            top: 0;
+            left: 0;
+            z-index: 2;                   /* Слои правильно ранжированы */
         }
 
-        /* РУБАШКА КАРТЫ (ЗАГРУЖАЕТСЯ ИЗ ФАЙЛА) */
+        /* --- РУБАШКА КАРТЫ (РАСТЯНУТА НА ПОЛНЫЙ РАЗМЕР) --- */
         .card-back {
             background-color: #2a2a3e;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-size: cover;               /* ЗАПОЛНЯЕТ ВСЮ КАРТУ */
+            background-position: center;          /* ЦЕНТРИРУЕТ РУБАШКУ */
+            background-repeat: no-repeat;         /* НЕ ДУБЛИРУЕТ */
             border: 3px solid #8B4513;
         }
 
@@ -154,13 +156,14 @@
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
         }
 
-        /* ЛИЦЕВАЯ СТОРОНА */
+        /* --- ЛИЦЕВАЯ СТОРОНА (ИЗБЕГАЕМ ИСЧЕЗНОВЕНИЯ) --- */
         .card-front {
             background: #1a1a2e;
-            transform: rotateY(180deg);
+            transform: rotateY(180deg);           /* Изначально повернута */
             display: flex;
             flex-direction: column;
             border: 3px solid #8B4513;
+            z-index: 3;                           /* Выше рубашки */
         }
 
         .card-image {
@@ -168,6 +171,8 @@
             height: 88%;
             object-fit: cover;
             object-position: top center;
+            display: block;                       /* Явное отображение */
+            flex-shrink: 0;
         }
 
         .card-info {
@@ -181,6 +186,7 @@
             gap: 3px;
             border-radius: 0 0 10px 10px;
             height: 12%;
+            flex-shrink: 0;
         }
 
         .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; }

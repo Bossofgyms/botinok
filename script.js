@@ -1,4 +1,3 @@
-// Полная колода Таро - 78 карт
 const TAROT_DECK = [
     // СТАРШИЕ АРКАНЫ (22 карты)
     { name: "0. Шут", meaning: "Начало, невинность, спонтанность", image: "images/fool.jpg", type: "major" },
@@ -24,7 +23,7 @@ const TAROT_DECK = [
     { name: "XX. Суд", meaning: "Возрождение, призыв, прощение", image: "images/judgement.jpg", type: "major" },
     { name: "XXI. Мир", meaning: "Завершение, единство, достижение", image: "images/world.jpg", type: "major" },
 
-    // МЛАДШИЕ АРКАНЫ - ЖЕЗЛЫ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — ЖЕЗЛЫ (14 карт)
     { name: "Туз Жезлов", meaning: "Вдохновение, энергия, потенциал", image: "images/wands01.jpg", type: "wands" },
     { name: "2 Жезлов", meaning: "Планирование, решение, партнерство", image: "images/wands02.jpg", type: "wands" },
     { name: "3 Жезлов", meaning: "Предвидение, сотрудничество, расширение", image: "images/wands03.jpg", type: "wands" },
@@ -40,7 +39,7 @@ const TAROT_DECK = [
     { name: "Королева Жезлов", meaning: "Уверенность, независимость, харизма", image: "images/wands13.jpg", type: "wands" },
     { name: "Король Жезлов", meaning: "Лидерство, предпринимательство, видение", image: "images/wands14.jpg", type: "wands" },
 
-    // МЛАДШИЕ АРКАНЫ - КУБКИ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — КУБКИ (14 карт)
     { name: "Туз Кубков", meaning: "Новая любовь, эмоциональное начало", image: "images/cups01.jpg", type: "cups" },
     { name: "2 Кубков", meaning: "Партнерство, союз, притяжение", image: "images/cups02.jpg", type: "cups" },
     { name: "3 Кубков", meaning: "Праздник, дружба, сообщество", image: "images/cups03.jpg", type: "cups" },
@@ -56,7 +55,7 @@ const TAROT_DECK = [
     { name: "Королева Кубков", meaning: "Забота, интуиция, сострадание", image: "images/cups13.jpg", type: "cups" },
     { name: "Король Кубков", meaning: "Эмоциональный контроль, дипломатия", image: "images/cups14.jpg", type: "cups" },
 
-    // МЛАДШИЕ АРКАНЫ - МЕЧИ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — МЕЧИ (14 карт)
     { name: "Туз Мечей", meaning: "Прорыв, ясность, истина", image: "images/swords01.jpg", type: "swords" },
     { name: "2 Мечей", meaning: "Тупик, баланс, решение", image: "images/swords02.jpg", type: "swords" },
     { name: "3 Мечей", meaning: "Сердечная боль, печаль, конфликт", image: "images/swords03.jpg", type: "swords" },
@@ -72,7 +71,7 @@ const TAROT_DECK = [
     { name: "Королева Мечей", meaning: "Ясность, независимость, принципы", image: "images/swords13.jpg", type: "swords" },
     { name: "Король Мечей", meaning: "Интеллект, власть, истина", image: "images/swords14.jpg", type: "swords" },
 
-    // МЛАДШИЕ АРКАНЫ - ПЕНТАКЛИ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — ПЕНТАКЛИ (14 карт)
     { name: "Туз Пентаклей", meaning: "Процветание, возможность, изобилие", image: "images/pents01.jpg", type: "pentacles" },
     { name: "2 Пентаклей", meaning: "Баланс, адаптация, приоритеты", image: "images/pents02.jpg", type: "pentacles" },
     { name: "3 Пентаклей", meaning: "Мастерство, сотрудничество, ремесло", image: "images/pents03.jpg", type: "pentacles" },
@@ -84,7 +83,7 @@ const TAROT_DECK = [
     { name: "9 Пентаклей", meaning: "Изобилие, роскошь, самообеспечение", image: "images/pents09.jpg", type: "pentacles" },
     { name: "10 Пентаклей", meaning: "Богатство, наследие, семья", image: "images/pents10.jpg", type: "pentacles" },
     { name: "Паж Пентаклей", meaning: "Изучение, усердие, потенциал", image: "images/pents11.jpg", type: "pentacles" },
-    { name: "Рыцарь Пентаклей", meaning: "Трудолюбие, надежность, ответственность", image: "images/pents12.jpg", type: "pentacles" },
+    { name: "Рыцарь Пентаклей", meaning: "Трудолюбие, надежность, ответственность", image: "images/pents12.jpg.jpg", type: "pentacles" },
     { name: "Королева Пентаклей", meaning: "Изобилие, комфорт, безопасность", image: "images/pents13.jpg", type: "pentacles" },
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
@@ -92,19 +91,22 @@ const TAROT_DECK = [
 class TarotApp {
     constructor() {
         this.selectedCards = [];
+        this.currentCards = [];
         this.question = this.getQuestionFromUrl();
         this.imageLoadErrors = new Set();
         this.deckType = 'full';
         this.isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        this.cardBackLoaded = false;
+        this.backgroundLoaded = false;
         this.init();
     }
 
     init() {
         document.documentElement.style.setProperty('--tg-theme-bg-color', '#0a0a0f');
         this.renderQuestion();
+        this.preloadAssets();
         this.generateCards();
         this.setupEventListeners();
-        this.updateResults();
         
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
@@ -122,14 +124,74 @@ class TarotApp {
         if (questionElement) { questionElement.textContent = this.question; }
     }
 
-    generateCards() {
-        let availableCards = [];
-        if (this.deckType === 'major') {
-            availableCards = TAROT_DECK.filter(card => card.type === 'major');
+    preloadAssets() {
+        this.loadBackground();
+        this.loadCardBack();
+    }
+
+    loadBackground() {
+        const bgImage = new Image();
+        bgImage.src = 'images/back.jpg';
+        bgImage.onload = () => { 
+            console.log('✅ Фон загружен'); 
+            this.backgroundLoaded = true; 
+            this.applyBackground();
+        };
+        bgImage.onerror = () => { 
+            console.warn('❌ Фон не загрузился'); 
+            this.backgroundLoaded = false; 
+            this.applyBackground();
+        };
+    }
+
+    applyBackground() {
+        if (this.backgroundLoaded) {
+            document.body.classList.add('has-bg-image');
+            document.body.style.backgroundImage = 'url("images/back.jpg")';
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.backgroundBlendMode = 'overlay';
+            document.body.style.backgroundOrigin = 'content-box';
         } else {
-            availableCards = [...TAROT_DECK];
+            document.body.style.backgroundImage = 'linear-gradient(135deg, #0a0a0f, #1a1a2e)';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.backgroundBlendMode = 'normal';
         }
-        
+    }
+
+    loadCardBack() {
+        const cardBackImage = new Image();
+        cardBackImage.src = 'images/card_back.jpg';
+        cardBackImage.onload = () => { 
+            console.log('✅ Рубашка карт загружена'); 
+            this.cardBackLoaded = true; 
+            this.updateCardBacks();
+        };
+        cardBackImage.onerror = () => { 
+            console.warn('❌ Рубашка карт не загрузилась'); 
+            this.cardBackLoaded = false; 
+            this.updateCardBacks();
+        };
+    }
+
+    updateCardBacks() {
+        const cardBacks = document.querySelectorAll('.card-back');
+        cardBacks.forEach(back => {
+            if (this.cardBackLoaded) {
+                back.classList.remove('fallback');
+                back.style.backgroundImage = 'none';
+                back.style.backgroundColor = '';
+            } else {
+                back.classList.add('fallback');
+                back.style.backgroundImage = 'none';
+            }
+        });
+    }
+
+    generateCards() {
+        let availableCards = [...TAROT_DECK];
         this.currentCards = this.shuffleArray([...availableCards]);
         this.renderCards();
     }
@@ -152,7 +214,6 @@ class TarotApp {
             const cardElement = this.createCardElement(card, index);
             if (cardElement) { container.appendChild(cardElement); }
             
-            // Плавное появление с задержкой
             setTimeout(() => {
                 cardElement.classList.add('fade-in');
                 cardElement.style.opacity = '0';
@@ -160,6 +221,7 @@ class TarotApp {
             }, index * 5);
         });
 
+        this.updateCardBacks();
         this.updateSubmitButton();
     }
 
@@ -170,16 +232,14 @@ class TarotApp {
         cardElement.dataset.cardName = card.name;
 
         const hasError = this.imageLoadErrors.has(card.image);
-        const placeholder = hasError || card.image.split('.').pop().startsWith('back');
 
         cardElement.innerHTML = `
             <div class="card-inner">
                 <div class="card-back">
-                    ${!placeholder ? '' : '<div class="placeholder-icon">🃏</div>'}
+                    ${!this.cardBackLoaded ? '<div class="fallback-placeholder">🃏</div>' : ''}
                 </div>
                 <div class="card-front">
-                    ${placeholder ? '' : `<img src="${card.image}" alt="${card.name}" class="card-image">`}
-                    ${placeholder ? '<div class="card-placeholder"><span class="placeholder-icon">🔮</span></div>' : ''}
+                    <img src="${card.image}" alt="${card.name}" class="card-image">
                     <div class="card-info">
                         <div class="card-name">${this.getShortName(card.name)}</div>
                         <div class="card-meaning">${card.meaning}</div>
@@ -188,25 +248,19 @@ class TarotApp {
             </div>
         `;
 
-        if (!placeholder) {
-            const imgElement = cardElement.querySelector('.card-image');
-            if (imgElement) {
-                imgElement.addEventListener('error', () => {
-                    this.imageLoadErrors.add(card.image);
-                    this.handleImageError(cardElement);
-                });
-            }
+        const imgElement = cardElement.querySelector('.card-image');
+        if (imgElement) {
+            imgElement.addEventListener('load', () => {
+                cardElement.classList.remove('image-error');
+            });
+            imgElement.addEventListener('error', () => {
+                this.imageLoadErrors.add(card.image);
+                cardElement.classList.add('image-error');
+            });
         }
 
         cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));
         return cardElement;
-    }
-
-    handleImageError(cardElement) {
-        cardElement.querySelectorAll('.card-image').forEach(img => {
-            img.style.display = 'none';
-            img.classList.add('card-error');
-        });
     }
 
     getShortName(fullName) {
@@ -229,8 +283,8 @@ class TarotApp {
     }
 
     flipCard(card, cardElement) {
-        if (this.selectedCards.length >= 3) {
-            this.showError('Максимум 3 карты!');
+        if (this.selectedCards.length >= 5) {
+            this.showError('Максимум 5 карт!');
             return;
         }
 
@@ -238,7 +292,6 @@ class TarotApp {
         cardElement.classList.add('selected');
         this.selectedCards.push(card);
         
-        // Анимация выбора
         this.animateSelection(cardElement);
         
         this.updateCounter();
@@ -276,7 +329,7 @@ class TarotApp {
         const counter = document.getElementById('selectedCount');
         if (counter) {
             counter.textContent = this.selectedCards.length;
-            if (this.selectedCards.length === 3) {
+            if (this.selectedCards.length === 5) {
                 counter.classList.add('highlight');
             }
         }
@@ -285,8 +338,8 @@ class TarotApp {
     updateSubmitButton() {
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) {
-            submitBtn.disabled = this.selectedCards.length !== 3;
-            submitBtn.textContent = this.selectedCards.length === 3 ? '🎯 Отправить расклад' : `📨 Отправить (${this.selectedCards.length}/3)`;
+            submitBtn.disabled = this.selectedCards.length !== 5;
+            submitBtn.textContent = this.selectedCards.length === 5 ? '🎯 Отправить расклад' : `📨 Отправить (${this.selectedCards.length}/5)`;
         }
     }
 
@@ -325,7 +378,6 @@ class TarotApp {
         if (submitBtn) { submitBtn.addEventListener('click', () => this.submitCards()); }
         if (shuffleBtn) { shuffleBtn.addEventListener('click', () => this.shuffleCards()); }
 
-        // Предотвращение двойного тапа
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
@@ -333,25 +385,23 @@ class TarotApp {
             lastTouchEnd = now;
         }, { passive: false });
 
-        // Предотвращение зума
         document.addEventListener('dblclick', (e) => {
             if (e.target.classList.contains('card')) { e.preventDefault(); }
         });
     }
 
     submitCards() {
-        if (this.selectedCards.length !== 3) {
-            this.showError('Выберите ровно 3 карты!');
+        if (this.selectedCards.length !== 5) {
+            this.showError('Выберите ровно 5 карт!');
             return;
         }
 
         const result = {
             question: this.question,
             cards: this.selectedCards.map(card => card.name),
-            meanings: this.selectedCards.map(card => card.meaning),
             deck_type: this.deckType,
             timestamp: new Date().toISOString(),
-            positions: [1, 2, 3]
+            positions: [1, 2, 3, 4, 5]
         };
 
         console.log('✅ Данные отправлены:', result);
@@ -364,8 +414,6 @@ class TarotApp {
                 console.error('Ошибка отправки:', error);
                 this.showError('Не удалось отправить расклад.');
             }
-        } else {
-            console.log('Расклад сохранён локально');
         }
     }
 
@@ -377,32 +425,19 @@ class TarotApp {
 
         const cards = document.querySelectorAll('.card');
         
-        // Анимация перемешивания
         cards.forEach((card, index) => {
-            const duration = 200 + Math.random() * 100;
-            const rotation = Math.random() * 360;
-            
-            card.style.transition = 'none';
-            card.style.transform = `translate(${Math.random()*100 - 50}px, ${Math.random()*50 - 25}px) rotate(${rotation}deg)`;
-            
             setTimeout(() => {
-                card.style.transition = 'transform 0.6s ease';
-                card.style.transform = '';
-            }, 50);
+                card.style.animation = 'shake 0.3s ease';
+                setTimeout(() => { card.style.animation = ''; }, 300);
+            }, index * 30);
         });
 
         setTimeout(() => {
             this.generateCards();
-        }, 800);
+        }, 400);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     window.tarotApp = new TarotApp();
-});
-
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && window.tarotApp) {
-        window.tarotApp.updateCounter();
-    }
 });

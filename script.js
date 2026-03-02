@@ -250,17 +250,19 @@ class TarotApp {
             img.addEventListener('load', () => {
                 console.log(`✅ Карта загружена: ${card.name}`);
                 cardElement.classList.remove('card-has-error');
-                placeholder.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'none';
+                if (img) img.style.display = 'block';
             });
 
             img.addEventListener('error', () => {
                 console.warn(`❌ Ошибка загрузки: ${card.image}`);
                 cardElement.classList.add('card-has-error');
-                placeholder.style.display = 'flex';
+                if (placeholder) placeholder.style.display = 'flex';
+                if (img) img.style.display = 'none';
             });
         } else {
             cardElement.classList.add('card-has-error');
-            placeholder.style.display = 'flex';
+            if (placeholder) placeholder.style.display = 'flex';
         }
 
         cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));

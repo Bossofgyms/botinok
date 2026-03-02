@@ -88,7 +88,7 @@ const TAROT_DECK = [
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
 
-// ... existing TAROT_DECK ...
+// ... существующий массив TAROT_DECK ...
 
 class TarotApp {
     constructor() {
@@ -245,7 +245,7 @@ class TarotApp {
             </div>
         `;
 
-        // Preload card image
+        // Загрузка изображения карты
         const img = cardElement.querySelector('.card-image');
         const placeholder = cardElement.querySelector('.card-placeholder');
 
@@ -268,10 +268,10 @@ class TarotApp {
             if (placeholder) placeholder.style.display = 'flex';
         }
 
-        // Add click handler for flipping
+        // Обработчик клика для переворота
         cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));
         
-        // Store card reference for later use
+        // Сохраняем данные карты
         cardElement._cardData = card;
         
         return cardElement;
@@ -297,10 +297,10 @@ class TarotApp {
             return;
         }
 
-        // Add selection classes
+        // Немедленно применяем визуальные состояния
         cardElement.classList.add('flipped', 'selected');
         
-        // Add to selected array
+        // Добавляем в выбранные
         this.selectedCards.push(card);
         
         this.animateSelection(cardElement);
@@ -310,8 +310,11 @@ class TarotApp {
     }
 
     deselectCard(card, cardElement) {
+        // Убираем визуальные состояния
         cardElement.classList.remove('selected');
         cardElement.classList.remove('flipped');
+        
+        // Убираем из выбранных
         this.selectedCards = this.selectedCards.filter(c => c.name !== card.name);
         
         this.updateCounter();
@@ -412,10 +415,10 @@ class TarotApp {
             setTimeout(() => { card.style.animation = ''; }, 300);
         });
 
-        // Reapply background after shuffle animation
+        // Обновляем карты и восстанавливаем фон
         setTimeout(() => { 
             this.generateCards();
-            // Ensure background remains applied after re-render
+            // Обязательно восстанавливаем фон после генерации новых карт
             if (this.backgroundLoaded) {
                 this.applyBackground();
             }

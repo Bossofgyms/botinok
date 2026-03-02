@@ -19,7 +19,6 @@
 
         .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
 
-        /* === ФОН ПРИЛОЖЕНИЯ === */
         @keyframes bgSlowMove {
             from { background-position: 0% 0%; }
             to { background-position: 100% 100%; }
@@ -96,7 +95,7 @@
 
         .cards-container {
             display: flex;
-            gap: 15px;                    /* РАВНОУДАЛЁННЫЕ КАРТЫ */
+            gap: 15px;
             padding: 10px;
             min-width: fit-content;
             justify-content: center;
@@ -105,24 +104,24 @@
 
         /* === КАРТА С РУБАШКОЙ === */
         .card {
-            width: 80px;                   /* ФИКСИРОВАННАЯ ШИРИНА */
-            height: 130px;                 /* ФИКСИРОВАННАЯ ВЫСОТА */
-            perspective: 1000px;           /* ДЛЯ 3D ПЕРЕВОРОТА */
+            width: 80px;
+            height: 130px;
+            perspective: 1000px;
             cursor: pointer;
             touch-action: manipulation;
             transition: transform 0.3s ease;
-            flex-shrink: 0;                /* Чтобы карты не сжимались */
+            flex-shrink: 0;
         }
 
         .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-            will-change: transform;        /* Для производительности */
+            will-change: transform;
         }
 
         .card.flipped .card-inner { transform: rotateY(180deg); }
@@ -130,40 +129,42 @@
 
         .card-front, .card-back {
             position: absolute;
-            width: 100%;                  /* ВАЖНО: на 100% размера родителя */
-            height: 100%;                 /* ВАЖНО: на 100% размера родителя */
-            backface-visibility: hidden;  /* Скрывает заднюю часть при перевороте */
+            width: 100%; 
+            height: 100%;
+            top: 0; left: 0;
+            backface-visibility: hidden;
             border-radius: 10px;
             overflow: hidden;
-            top: 0;
-            left: 0;
-            z-index: 2;                   /* Слои правильно ранжированы */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* --- РУБАШКА КАРТЫ (РАСТЯНУТА НА ПОЛНЫЙ РАЗМЕР) --- */
+        /* --- РУБАШКА КАРТЫ --- */
         .card-back {
             background-color: #2a2a3e;
-            background-size: cover;               /* ЗАПОЛНЯЕТ ВСЮ КАРТУ */
-            background-position: center;          /* ЦЕНТРИРУЕТ РУБАШКУ */
-            background-repeat: no-repeat;         /* НЕ ДУБЛИРУЕТ */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             border: 3px solid #8B4513;
+            z-index: 10;
         }
 
-        /* Если рубашка не загружена — показываем emoji */
         .card-back.fallback::after {
             content: "🃏";
             font-size: 42px;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
         }
 
-        /* --- ЛИЦЕВАЯ СТОРОНА (ИЗБЕГАЕМ ИСЧЕЗНОВЕНИЯ) --- */
+        /* --- ЛИЦЕВАЯ СТОРОНА (ИСПРАВЛЕНА ПОЗИЦИЯ!) --- */
         .card-front {
             background: #1a1a2e;
-            transform: rotateY(180deg);           /* Изначально повернута */
+            transform: rotateY(180deg);
             display: flex;
             flex-direction: column;
             border: 3px solid #8B4513;
-            z-index: 3;                           /* Выше рубашки */
+            z-index: 20;
+            backface-visibility: hidden;
         }
 
         .card-image {
@@ -171,7 +172,7 @@
             height: 88%;
             object-fit: cover;
             object-position: top center;
-            display: block;                       /* Явное отображение */
+            display: block !important;
             flex-shrink: 0;
         }
 
@@ -192,19 +193,20 @@
         .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; }
         .card-meaning { font-size: 6px; line-height: 1.1; text-align: center; opacity: 0.8; }
 
-        /* Если картинка карты не загрузилась */
         .card-image.error { display: none !important; }
         .card-placeholder {
-            display: none;
+            display: none !important;
             width: 100%;
             height: 88%;
             background: linear-gradient(135deg, #8B4513, #A0522D);
             align-items: center;
             justify-content: center;
             font-size: 32px;
+            position: absolute;
+            top: 0; left: 0;
         }
 
-        .card-has-error .card-placeholder { display: flex; }
+        .card-has-error .card-placeholder { display: flex !important; }
 
         .results-container {
             background: rgba(255,255,255,0.1);

@@ -93,9 +93,7 @@ class TarotApp {
         this.selectedCards = [];
         this.currentCards = [];
         this.question = this.getQuestionFromUrl();
-        this.cardsLoaded = false;
         
-        // Функция предзагрузки изображения
         this.preloadImage = (url) => {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -118,11 +116,9 @@ class TarotApp {
             window.Telegram.WebApp.expand();
         }
         
-        // Предзагрузка картинок рубашки и фона
-        await this.preloadImage('/images/card_back.jpg');
-        await this.preloadImage('/images/back.jpg');
+        await this.preloadImage('/back.jpg');
+        await this.preloadImage('/card_back.jpg');
         
-        this.cardsLoaded = true;
         this.generateCards();
         this.setupEventListeners();
     }
@@ -139,30 +135,22 @@ class TarotApp {
     }
 
     generateCards() {
-        // СБРОС ВЫБОРА КАРТ
         this.selectedCards = [];
-        
-        // ГЕНЕРАЦИЯ НОВЫХ КАРТ
         const shuffled = [...TAROT_DECK].sort(() => Math.random() - 0.5);
         this.currentCards = shuffled.slice(0, 5);
-        
         this.renderCards();
         this.updateUI();
     }
 
     renderCards() {
         const container = document.getElementById('cardsContainer');
-        
-        // Очистка контейнера
         container.innerHTML = '';
         
-        // Создание новых карт
         this.currentCards.forEach((card, index) => {
             const cardEl = document.createElement('div');
             cardEl.className = 'card';
             cardEl.dataset.cardName = card.name;
             
-            // Создаём структуру карты
             cardEl.innerHTML = `
                 <div class="card-inner">
                     <div class="card-back"></div>
@@ -177,7 +165,6 @@ class TarotApp {
                 </div>
             `;
             
-            // Добавляем обработчики событий
             const img = cardEl.querySelector('.card-image');
             const placeholder = cardEl.querySelector('.card-placeholder');
             
@@ -198,7 +185,6 @@ class TarotApp {
             
             cardEl.addEventListener('click', () => this.toggleCard(card, cardEl));
             
-            // Добавляем в DOM с задержкой для плавности
             setTimeout(() => {
                 container.appendChild(cardEl);
             }, index * 50);
@@ -211,7 +197,6 @@ class TarotApp {
         const isSelected = this.selectedCards.some(c => c.name === card.name);
         
         if (isSelected) {
-            // Снимаем выбор
             this.selectedCards = this.selectedCards.filter(c => c.name !== card.name);
             element.classList.remove('flipped', 'selected');
         } else {
@@ -220,7 +205,6 @@ class TarotApp {
                 return;
             }
             
-            // Добавляем выбор
             this.selectedCards.push(card);
             element.classList.add('flipped', 'selected');
         }
@@ -229,20 +213,15 @@ class TarotApp {
     }
 
     updateUI() {
-        // Обновляем счётчик
         document.getElementById('selectedCount').textContent = this.selectedCards.length;
-        
-        // Активируем кнопку отправки
         document.getElementById('submitBtn').disabled = this.selectedCards.length !== 3;
         
-        // Обновляем текст кнопки
         if (this.selectedCards.length === 3) {
             document.getElementById('submitBtn').textContent = '🎯 Отправить расклад';
         } else {
             document.getElementById('submitBtn').textContent = `📨 ${this.selectedCards.length}/3`;
         }
         
-        // Показываем список выбранных карт
         const list = document.getElementById('selectedCardsList');
         const container = document.getElementById('resultsContainer');
         
@@ -276,7 +255,6 @@ class TarotApp {
     }
 
     showShuffleAnimation() {
-        // Простая анимация исчезновения
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
             card.style.opacity = '0';
@@ -284,7 +262,6 @@ class TarotApp {
         
         setTimeout(() => {
             this.generateCards();
-            
             cards.forEach(card => {
                 card.style.opacity = '1';
             });
@@ -319,8 +296,6 @@ class TarotApp {
     }
 }
 
-// Запуск приложения
 document.addEventListener('DOMContentLoaded', () => {
     window.tarotApp = new TarotApp();
 });
-

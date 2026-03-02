@@ -15,9 +15,12 @@
             overflow-x: auto;
             scroll-behavior: smooth;
         }
-        .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
+
         @keyframes bgSlowMove { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
         body.has-bg-image { animation: bgSlowMove 60s ease infinite alternate; }
+
+        .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
+
         .header {
             text-align: center;
             margin-bottom: 15px;
@@ -28,6 +31,7 @@
             border: 1px solid rgba(255,255,255,0.15);
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
+
         .header h1 {
             font-size: 20px;
             margin-bottom: 10px;
@@ -37,6 +41,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .question {
             background: rgba(255,255,255,0.15);
             padding: 12px;
@@ -50,15 +55,49 @@
             overflow-y: auto;
             word-wrap: break-word;
         }
-        .counter-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
-        .counter { font-size: 14px; font-weight: bold; background: linear-gradient(135deg, #2F4F4F, #3A5A40); color: white; padding: 8px 16px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .cards-wrapper { width: 100%; overflow-x: auto; overflow-y: hidden; padding: 10px 0; scrollbar-width: thin; scrollbar-color: #8B4513 #1c1c1e; margin-bottom: 15px; }
+
+        .counter-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .counter {
+            font-size: 14px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #2F4F4F, #3A5A40);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .cards-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0;
+            scrollbar-width: thin;
+            scrollbar-color: #8B4513 #1c1c1e;
+            margin-bottom: 15px;
+        }
+
         .cards-wrapper::-webkit-scrollbar { height: 6px; }
         .cards-wrapper::-webkit-scrollbar-track { background: #1c1c1e; border-radius: 3px; }
         .cards-wrapper::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 3px; }
-        .cards-container { display: flex; gap: 15px; padding: 10px; min-width: fit-content; justify-content: center; align-items: center; }
-        
-        /* === УПРОЩЕННАЯ АНИМАЦИЯ КАРТЫ === */
+
+        .cards-container {
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            min-width: fit-content;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* === КАРТА === */
         .card {
             width: 80px;
             height: 130px;
@@ -67,19 +106,29 @@
             touch-action: manipulation;
             transition: transform 0.3s ease;
             flex-shrink: 0;
-            opacity: 1; /* Явно задаём видимость */
+            opacity: 1 !important;
+            visibility: visible !important;
         }
+
         .card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.8s ease-out;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
-        .card.flipped .card-inner { transform: rotateY(180deg); }
-        .card.selected .card-inner { box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 50px rgba(255,165,0,0.6); filter: brightness(1.15); }
+
+        .card.flipped .card-inner { 
+            transform: rotateY(180deg); 
+        }
+
+        .card.selected .card-inner { 
+            box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 50px rgba(255,165,0,0.6); 
+            filter: brightness(1.15); 
+        }
+
         .card-front, .card-back {
             position: absolute;
             width: 100%; 
@@ -88,29 +137,36 @@
             backface-visibility: hidden;
             border-radius: 10px;
             overflow: hidden;
-            display: block; /* Явное указание отображения */
+            display: block !important;
         }
-        /* --- РУБАШКА КАРТЫ --- */
+
+        /* --- РУБАШКА --- */
         .card-back {
             background-color: #2a2a3e;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             border: 3px solid #8B4513;
+            z-index: 10;
         }
+
         .card-back.fallback::after {
             content: "🃏";
             font-size: 42px;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
         }
-        /* --- ЛИЦЕВАЯ СТОРОНА --- */
+
+        /* --- ЛИЦЕВАЯ СТОРОНА (ИСПРАВЛЕНА!) --- */
         .card-front {
             background: #1a1a2e;
             transform: rotateY(180deg);
             border: 3px solid #8B4513;
+            z-index: 20;
             display: flex;
             flex-direction: column;
+            will-change: transform;
         }
+
         .card-image {
             width: 100%;
             height: 88%;
@@ -118,6 +174,7 @@
             object-position: top center;
             display: block !important;
         }
+
         .card-info {
             padding: 10px 6px;
             display: flex;
@@ -129,25 +186,93 @@
             gap: 3px;
             border-radius: 0 0 10px 10px;
             height: 12%;
+            flex-shrink: 0;
         }
+
         .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; }
         .card-meaning { font-size: 6px; line-height: 1.1; text-align: center; opacity: 0.8; }
-        .card-placeholder { display: none !important; }
+
+        .card-placeholder {
+            display: none !important;
+            width: 100%;
+            height: 88%;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
         .card-has-error .card-placeholder { display: flex !important; }
         .card-has-error .card-image { display: none !important; }
-        .results-container { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; margin: 15px 0; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); display: none; }
+
+        .results-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: none;
+        }
+
         .results-title { font-size: 14px; font-weight: bold; margin-bottom: 8px; text-align: center; color: #ffd700; }
         .selected-cards { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .selected-card-item { background: linear-gradient(135deg, #2F4F4F, #3A5A40); color: white; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .selected-card-item {
+            background: linear-gradient(135deg, #2F4F4F, #3A5A40);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         .actions { display: flex; gap: 10px; margin: 15px 0; }
-        .submit-btn, .shuffle-btn { padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; flex: 1; text-transform: uppercase; letter-spacing: 0.5px; }
-        .submit-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #2F4F4F; box-shadow: 0 4px 15px rgba(255,215,0,0.3); }
+
+        .submit-btn, .shuffle-btn {
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #2F4F4F;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+
         .submit-btn:disabled { background: linear-gradient(45deg, #666, #888); color: #aaa; cursor: not-allowed; box-shadow: none; }
+        
         .shuffle-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); }
+
         .instructions { text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; line-height: 1.4; }
-        @media (max-width: 375px) { .card { width: 70px; height: 110px; } .cards-container { gap: 12px; } .card-name { font-size: 8px; } .card-meaning { font-size: 5px; } }
-        @media (min-width: 1024px) { .card { width: 90px; height: 140px; } }
+
+        @media (max-width: 375px) {
+            .card { width: 70px; height: 110px; }
+            .cards-container { gap: 12px; }
+            .card-name { font-size: 8px; }
+            .card-meaning { font-size: 5px; }
+        }
+
+        @media (min-width: 1024px) {
+            .card { width: 90px; height: 140px; }
+        }
     </style>
 </head>
 <body>

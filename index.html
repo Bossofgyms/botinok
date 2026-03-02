@@ -102,7 +102,7 @@
             align-items: center;
         }
 
-        /* === КАРТА С РУБАШКОЙ === */
+        /* === КАРТА С РУБАШКОЙ (ИСПРАВЛЕНА!) === */
         .card {
             width: 80px;
             height: 130px;
@@ -114,18 +114,23 @@
         }
 
         .card-inner {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%;
+            position: relative;  /* ВАЖНО: не absolute! */
+            width: 100%;
+            height: 100%;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-            will-change: transform;
         }
 
-        .card.flipped .card-inner { transform: rotateY(180deg); }
-        .card.selected .card-inner { box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 50px rgba(255,165,0,0.6); filter: brightness(1.15); }
+        .card.flipped .card-inner { 
+            transform: rotateY(180deg); 
+        }
+
+        .card.selected .card-inner { 
+            box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 50px rgba(255,165,0,0.6); 
+            filter: brightness(1.15); 
+        }
 
         .card-front, .card-back {
             position: absolute;
@@ -135,9 +140,6 @@
             backface-visibility: hidden;
             border-radius: 10px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         /* --- РУБАШКА КАРТЫ --- */
@@ -147,7 +149,6 @@
             background-position: center;
             background-repeat: no-repeat;
             border: 3px solid #8B4513;
-            z-index: 10;
         }
 
         .card-back.fallback::after {
@@ -156,15 +157,13 @@
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
         }
 
-        /* --- ЛИЦЕВАЯ СТОРОНА (ИСПРАВЛЕНА ПОЗИЦИЯ!) --- */
+        /* --- ЛИЦЕВАЯ СТОРОНА (ИСПРАВЛЕНО!) --- */
         .card-front {
             background: #1a1a2e;
             transform: rotateY(180deg);
             display: flex;
             flex-direction: column;
             border: 3px solid #8B4513;
-            z-index: 20;
-            backface-visibility: hidden;
         }
 
         .card-image {
@@ -173,7 +172,6 @@
             object-fit: cover;
             object-position: top center;
             display: block !important;
-            flex-shrink: 0;
         }
 
         .card-info {
@@ -187,13 +185,11 @@
             gap: 3px;
             border-radius: 0 0 10px 10px;
             height: 12%;
-            flex-shrink: 0;
         }
 
         .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; }
         .card-meaning { font-size: 6px; line-height: 1.1; text-align: center; opacity: 0.8; }
 
-        .card-image.error { display: none !important; }
         .card-placeholder {
             display: none !important;
             width: 100%;
@@ -207,6 +203,7 @@
         }
 
         .card-has-error .card-placeholder { display: flex !important; }
+        .card-has-error .card-image { display: none !important; }
 
         .results-container {
             background: rgba(255,255,255,0.1);

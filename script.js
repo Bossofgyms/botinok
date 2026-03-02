@@ -88,6 +88,8 @@ const TAROT_DECK = [
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
 
+// ... existing TAROT_DECK ...
+
 class TarotApp {
     constructor() {
         this.selectedCards = [];
@@ -243,6 +245,7 @@ class TarotApp {
             </div>
         `;
 
+        // Preload card image
         const img = cardElement.querySelector('.card-image');
         const placeholder = cardElement.querySelector('.card-placeholder');
 
@@ -265,7 +268,12 @@ class TarotApp {
             if (placeholder) placeholder.style.display = 'flex';
         }
 
+        // Add click handler for flipping
         cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));
+        
+        // Store card reference for later use
+        cardElement._cardData = card;
+        
         return cardElement;
     }
 
@@ -279,17 +287,20 @@ class TarotApp {
         if (isSelected) {
             this.deselectCard(card, cardElement);
         } else {
-            this.flipCard(card, cardElement);
+            this.selectCard(card, cardElement);
         }
     }
 
-    flipCard(card, cardElement) {
+    selectCard(card, cardElement) {
         if (this.selectedCards.length >= 3) {
             this.showError('Максимум 3 карты! Выберите 3 из 5.');
             return;
         }
 
+        // Add selection classes
         cardElement.classList.add('flipped', 'selected');
+        
+        // Add to selected array
         this.selectedCards.push(card);
         
         this.animateSelection(cardElement);
@@ -401,7 +412,14 @@ class TarotApp {
             setTimeout(() => { card.style.animation = ''; }, 300);
         });
 
-        setTimeout(() => { this.generateCards(); }, 400);
+        // Reapply background after shuffle animation
+        setTimeout(() => { 
+            this.generateCards();
+            // Ensure background remains applied after re-render
+            if (this.backgroundLoaded) {
+                this.applyBackground();
+            }
+        }, 400);
     }
 }
 

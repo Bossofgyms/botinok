@@ -98,6 +98,7 @@ class TarotApp {
         this.backgroundLoaded = false;
         this.isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         this.imageCacheKey = Date.now();
+        this.cardImagesLoaded = new Map(); // Отслеживаем загруженные карты
         this.init();
     }
 
@@ -188,16 +189,15 @@ class TarotApp {
             document.body.style.backgroundRepeat = 'no-repeat';
             document.body.style.backgroundAttachment = 'fixed';
             document.body.style.backgroundBlendMode = 'overlay';
-            document.body.style.backgroundOrigin = 'content-box';
         } else {
             document.body.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e, #0a0a0f)';
             document.body.style.backgroundAttachment = 'fixed';
-            document.body.style.backgroundBlendMode = 'normal';
         }
     }
 
     generateCards() {
         this.imageCacheKey = Date.now();
+        this.cardImagesLoaded.clear();
         console.log('💥 Новые карты! Cache Key:', this.imageCacheKey);
         let availableCards = [...TAROT_DECK];
         this.currentCards = this.shuffleArray([...availableCards]).slice(0, 5);
@@ -215,14 +215,26 @@ class TarotApp {
 
     renderCards() {
         const container = document.getElementById('cardsContainer');
-        if (!container) { console.error("❌ Контейнер не найден"); return; }
+        if (!container) { 
+            console.error("❌ Контейнер не найден"); 
+            return; 
+        }
+        
         console.log('📝 Рендерим карты. Cache Key:', this.imageCacheKey);
         container.innerHTML = '';
+        
         this.currentCards.forEach((card, index) => {
             const cardElement = this.createCardElement(card, index);
-            if (cardElement) container.appendChild(cardElement);
-            setTimeout(() => { cardElement.classList.add('fade-in'); }, index * 50);
+            if (cardElement) {
+                container.appendChild(cardElement);
+                
+                // Добавляем небольшую задержку для анимации появления
+                setTimeout(() => { 
+                    cardElement.classList.add('fade-in'); 
+                }, index * 50);
+            }
         });
+        
         this.updateSubmitButton();
     }
 
@@ -230,13 +242,19 @@ class TarotApp {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
         cardElement.dataset.cardName = card.name;
+        cardElement.dataset.cardIndex = index;
+        
         const imageUrl = card.image + '?t=' + this.imageCacheKey;
+        
         cardElement.innerHTML = `
             <div class="card-inner">
                 <div class="card-back"></div>
                 <div class="card-front">
-                    <img src="${imageUrl}" alt="${card.name}" class="card-image" data-card-name="${card.name}">
-                    <div class="card-placeholder" data-card-name="${card.name}">🃏</div>
+                    <img src="${imageUrl}" 
+                         alt="${card.name}" 
+                         class="card-image" 
+                         data-card-name="${card.name}"
+                         loading="lazy">
                     <div class="card-info">
                         <div class="card-name">${this.getShortName(card.name)}</div>
                         <div class="card-meaning">${card.meaning}</div>
@@ -244,26 +262,52 @@ class TarotApp {
                 </div>
             </div>
         `;
+
         const img = cardElement.querySelector('.card-image');
-        const placeholder = cardElement.querySelector('.card-placeholder');
-        if (img) {
-            img.addEventListener('load', () => {
-                console.log(`✅ Карта загружена: ${card.name}`);
-                cardElement.classList.remove('card-has-error');
-                if (placeholder) placeholder.style.display = 'none';
-                if (img) img.style.display = 'block';
-            });
-            img.addEventListener('error', () => {
-                console.warn(`❌ Ошибка загрузки: ${imageUrl}`);
-                cardElement.classList.add('card-has-error');
-                if (placeholder) placeholder.style.display = 'flex';
-                if (img) img.style.display = 'none';
-            });
+        
+        // Обработчик загрузки изображения
+        img.addEventListener('load', () => {
+            console.log(`✅ Карта загружена: ${card.name}`);
+            this.cardImagesLoaded.set(card.name, true);
+            cardElement.classList.remove('card-loading');
+            cardElement.classList.add('card-loaded');
+            
+            // Если карта была выбрана до загрузки, показываем её
+            if (this.selectedCards.some(c => c.name === card.name)) {
+                cardElement.classList.add('flipped');
+            }
+        });
+
+        // Обработчик ошибки загрузки
+        img.addEventListener('error', () => {
+            console.warn(`❌ Ошибка загрузки: ${imageUrl}`);
+            this.cardImagesLoaded.set(card.name, false);
+            cardElement.classList.add('card-load-error');
+            
+            // Показываем информацию о карте даже без изображения
+            const cardFront = cardElement.querySelector('.card-front');
+            if (cardFront) {
+                cardFront.style.backgroundColor = 'rgba(26, 26, 46, 0.95)';
+            }
+        });
+
+        // Если карта уже была загружена ранее
+        if (this.cardImagesLoaded.has(card.name)) {
+            if (this.cardImagesLoaded.get(card.name)) {
+                cardElement.classList.add('card-loaded');
+            } else {
+                cardElement.classList.add('card-load-error');
+            }
         } else {
-            cardElement.classList.add('card-has-error');
-            if (placeholder) placeholder.style.display = 'flex';
+            cardElement.classList.add('card-loading');
         }
-        cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));
+
+        // Добавляем обработчик клика
+        cardElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.toggleCard(card, cardElement);
+        });
+
         return cardElement;
     }
 
@@ -273,83 +317,126 @@ class TarotApp {
 
     toggleCard(card, cardElement) {
         const isSelected = this.selectedCards.some(c => c.name === card.name);
-        if (isSelected) this.deselectCard(card, cardElement);
-        else this.flipCard(card, cardElement);
+        
+        if (isSelected) {
+            this.deselectCard(card, cardElement);
+        } else {
+            this.selectCard(card, cardElement);
+        }
     }
 
-    flipCard(card, cardElement) {
+    selectCard(card, cardElement) {
         if (this.selectedCards.length >= 3) {
             this.showError('Максимум 3 карты! Выберите 3 из 5.');
             return;
         }
+
+        // Проверяем, загружено ли изображение
+        const img = cardElement.querySelector('.card-image');
+        const isImageLoaded = img && img.complete && img.naturalHeight !== 0;
+        
+        if (!isImageLoaded) {
+            console.log('⚠️ Изображение ещё не загружено, но добавляем класс flipped');
+        }
+
+        // Добавляем классы для переворота
         cardElement.classList.add('flipped', 'selected');
+        
+        // Сохраняем выбранную карту
         this.selectedCards.push(card);
+        
+        // Анимация
         this.animateSelection(cardElement);
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
+        
+        console.log(`🃏 Выбрана карта: ${card.name}`);
     }
 
     deselectCard(card, cardElement) {
+        // Убираем классы переворота
         cardElement.classList.remove('selected');
         cardElement.classList.remove('flipped');
+        
+        // Удаляем из выбранных
         this.selectedCards = this.selectedCards.filter(c => c.name !== card.name);
+        
+        // Обновляем интерфейс
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
+        
+        console.log(`🃏 Карта убрана: ${card.name}`);
     }
 
     animateSelection(cardElement) {
         cardElement.style.transform = 'scale(1.1)';
-        setTimeout(() => { cardElement.style.transform = 'scale(1)'; }, 150);
+        setTimeout(() => { 
+            cardElement.style.transform = 'scale(1)'; 
+        }, 150);
     }
 
     updateCounter() {
         const counter = document.getElementById('selectedCount');
         if (counter) {
             counter.textContent = this.selectedCards.length;
-            if (this.selectedCards.length === 3) counter.classList.add('highlight');
+            if (this.selectedCards.length === 3) {
+                counter.classList.add('highlight');
+            } else {
+                counter.classList.remove('highlight');
+            }
         }
     }
 
     updateSubmitButton() {
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) {
-            submitBtn.disabled = this.selectedCards.length !== 3;
-            submitBtn.textContent = this.selectedCards.length === 3 ? '🎯 Отправить расклад' : `📨 ${this.selectedCards.length}/3`;
+            const isEnabled = this.selectedCards.length === 3;
+            submitBtn.disabled = !isEnabled;
+            submitBtn.textContent = isEnabled ? '🎯 Отправить расклад' : `📨 ${this.selectedCards.length}/3`;
+            
+            if (isEnabled) {
+                submitBtn.classList.add('enabled');
+            } else {
+                submitBtn.classList.remove('enabled');
+            }
         }
     }
 
     updateResults() {
         const resultsContainer = document.getElementById('resultsContainer');
         const list = document.getElementById('selectedCardsList');
+        
         if (this.selectedCards.length > 0) {
             resultsContainer.style.display = 'block';
-            list.innerHTML = this.selectedCards.map(card => `<div class="selected-card-item">${this.getShortName(card.name)}</div>`).join('');
+            list.innerHTML = this.selectedCards.map(card => 
+                `<div class="selected-card-item">${this.getShortName(card.name)}</div>`
+            ).join('');
         } else {
             resultsContainer.style.display = 'none';
         }
     }
 
     showError(message) {
-        // ✅ ИСПРАВЛЕНИЕ: showPopup → showAlert (поддержка Telegram Web App v6+)
         if (window.Telegram?.WebApp && typeof window.Telegram.WebApp.showAlert === 'function') {
             window.Telegram.WebApp.showAlert(message);
-        } else {
-            // Fallback для обычного браузера или старых версий
-            if (typeof window.alert === 'function') {
-                window.alert(message);
-            }
+        } else if (typeof window.alert === 'function') {
+            window.alert(message);
         }
     }
 
     setupEventListeners() {
         document.getElementById('submitBtn')?.addEventListener('click', () => this.submitCards());
         document.getElementById('shuffleBtn')?.addEventListener('click', () => this.shuffleCards());
+        
+        // Защита от двойного тапа на мобильных
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
             const lastTouchEnd = this.lastTouchEnd || 0;
-            if (now - lastTouchEnd <= 300) { e.preventDefault(); }
+            if (now - lastTouchEnd <= 300) { 
+                e.preventDefault(); 
+            }
             this.lastTouchEnd = now;
         }, { passive: false });
     }
@@ -359,13 +446,31 @@ class TarotApp {
             this.showError('Выберите ровно 3 карты!');
             return;
         }
+
+        // Проверяем, все ли выбранные карты загружены
+        const allImagesLoaded = this.selectedCards.every(card => {
+            const imgLoaded = this.cardImagesLoaded.get(card.name);
+            return imgLoaded === true;
+        });
+
+        if (!allImagesLoaded) {
+            console.log('⚠️ Не все изображения загружены, но отправляем данные');
+        }
+
         const result = {
             question: this.question,
-            cards: this.selectedCards.map(card => card.name),
+            cards: this.selectedCards.map(card => ({
+                name: card.name,
+                meaning: card.meaning,
+                type: card.type
+            })),
             total_available: 5,
-            positions: [1, 2, 3]
+            positions: [1, 2, 3],
+            timestamp: new Date().toISOString()
         };
+        
         console.log('✅ Отправка:', JSON.stringify(result, null, 2));
+        
         if (window.Telegram?.WebApp) {
             try {
                 window.Telegram.WebApp.sendData(JSON.stringify(result));
@@ -376,31 +481,141 @@ class TarotApp {
                 }, 1000);
             } catch (error) {
                 console.error('Ошибка отправки:', error);
-                this.showError('Ошибка отправки.');
+                this.showError('Ошибка отправки. Попробуйте еще раз.');
             }
         }
     }
 
     shuffleCards() {
         console.log('🔄 Перемешиваем карты...');
-        this.selectedCards = [];
-        this.updateCounter();
-        this.updateSubmitButton();
-        this.updateResults();
+        
+        // Анимация исчезновения
         const cards = document.querySelectorAll('.card');
         cards.forEach((card, index) => {
-            card.style.opacity = '0.7';
-            setTimeout(() => { 
-                card.style.opacity = ''; 
-            }, 400);
+            card.style.transition = 'opacity 0.3s, transform 0.3s';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.8)';
         });
+        
+        // Сбрасываем состояние
         setTimeout(() => { 
-            this.generateCards(); 
-        }, 400);
+            this.selectedCards = [];
+            this.cardImagesLoaded.clear();
+            this.updateCounter();
+            this.updateSubmitButton();
+            this.updateResults();
+            
+            // Генерируем новые карты
+            this.generateCards();
+            
+        }, 300);
     }
 }
 
+// Запускаем приложение после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🌙 DOM Content Loaded');
+    
+    // Добавляем базовые стили, если их нет
+    if (!document.querySelector('#tarot-styles')) {
+        const style = document.createElement('style');
+        style.id = 'tarot-styles';
+        style.textContent = `
+            .card {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                cursor: pointer;
+                transition: transform 0.3s, opacity 0.3s;
+                transform-style: preserve-3d;
+            }
+            
+            .card-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }
+            
+            .card.flipped .card-inner {
+                transform: rotateY(180deg);
+            }
+            
+            .card-front, .card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+            
+            .card-front {
+                transform: rotateY(180deg);
+                background: #1a1a2e;
+            }
+            
+            .card-back {
+                background: #2a2a3a;
+                background-size: cover;
+                background-position: center;
+            }
+            
+            .card-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+            
+            .card.fade-in {
+                opacity: 1 !important;
+            }
+            
+            .card-loading .card-front {
+                background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+            }
+            
+            @keyframes loading {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+            }
+            
+            .card-load-error .card-front {
+                background: #2a1a1a;
+            }
+            
+            .card-info {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 10px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                transform: translateY(100%);
+                transition: transform 0.3s;
+            }
+            
+            .card:hover .card-info {
+                transform: translateY(0);
+            }
+            
+            .card-name {
+                font-weight: bold;
+                font-size: 14px;
+            }
+            
+            .card-meaning {
+                font-size: 12px;
+                opacity: 0.9;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
     window.tarotApp = new TarotApp();
 });

@@ -20,15 +20,12 @@
 
         .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
 
-        /* === ФОН ПРИЛОЖЕНИЯ === */
         @keyframes bgSlowMove {
             from { background-position: 0% 0%; }
             to { background-position: 100% 100%; }
         }
 
-        body.has-bg-image {
-            animation: bgSlowMove 60s ease infinite alternate;
-        }
+        body.has-bg-image { animation: bgSlowMove 60s ease infinite alternate; }
 
         .header {
             text-align: center;
@@ -125,14 +122,8 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
-        .card.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
-
-        .card.selected .card-inner {
-            box-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 30px rgba(255,165,0,0.6);
-            filter: brightness(1.1);
-        }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card.selected .card-inner { box-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 30px rgba(255,165,0,0.6); filter: brightness(1.1); }
 
         .card-front, .card-back {
             position: absolute;
@@ -187,23 +178,8 @@
             gap: 2px;
         }
 
-        .card-name {
-            font-size: 8px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 1.1;
-            max-width: 100%;
-            word-break: break-word;
-        }
-
-        .card-meaning {
-            font-size: 7px;
-            line-height: 1.1;
-            text-align: center;
-            opacity: 0.9;
-            max-width: 100%;
-            word-break: break-word;
-        }
+        .card-name { font-size: 8px; font-weight: bold; text-align: center; line-height: 1.1; }
+        .card-meaning { font-size: 7px; line-height: 1.1; text-align: center; opacity: 0.9; }
 
         .results-container {
             background: rgba(255,255,255,0.1);
@@ -246,11 +222,7 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-        }
+        .actions { display: flex; gap: 10px; margin: 15px 0; }
 
         .submit-btn, .shuffle-btn {
             padding: 14px;
@@ -296,38 +268,6 @@
             line-height: 1.4;
         }
 
-        .card-placeholder {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 0;
-        }
-
-        .placeholder-icon {
-            font-size: 24px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-        }
-
-        .card-info .placeholder-message {
-            display: none;
-        }
-
-        .image-error .card-image {
-            display: none !important;
-        }
-
-        .image-error .card-info .placeholder-message {
-            display: flex !important;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            font-size: 20px;
-        }
-
         @media (max-width: 375px) {
             .card { width: 65px; height: 100px; }
             .card-name { font-size: 7px; }
@@ -347,7 +287,7 @@
             <h1>🔮 Таро Расклад</h1>
             <div class="question"><strong>Вопрос:</strong> <span id="questionText">Загрузка...</span></div>
             <div class="counter-container">
-                <div class="counter">Выбрано: <span id="selectedCount">0</span>/5 карт</div>
+                <div class="counter">Выбрано: <span id="selectedCount">0</span>/3 карт</div>
             </div>
         </div>
 
@@ -362,12 +302,12 @@
 
         <div class="actions">
             <button id="shuffleBtn" class="shuffle-btn">🔄 Перемешать</button>
-            <button id="submitBtn" class="submit-btn" disabled>📨 Отправить расклад (5)</button>
+            <button id="submitBtn" class="submit-btn" disabled>📨 Отправить расклад (3 из 5)</button>
         </div>
 
         <div class="instructions">
             💡 Нажми на карту — она перевернётся.<br>
-            Выбери 5 карт для твоего расклада.
+            Выбери **3 карты из 5** для твоего расклада.
         </div>
     </div>
 

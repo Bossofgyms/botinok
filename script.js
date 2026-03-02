@@ -229,10 +229,11 @@ class TarotApp {
         cardElement.className = 'card';
         cardElement.dataset.cardName = card.name;
 
+        // ВАЖНОЕ ИЗМЕНЕНИЕ: Новая HTML структура
         cardElement.innerHTML = `
             <div class="card-inner">
-                <div class="card-back"></div>
-                <div class="card-front">
+                <div class="card-side card-back"></div>
+                <div class="card-side card-front">
                     <img src="${card.image}" alt="${card.name}" class="card-image" data-card-name="${card.name}">
                     <div class="card-placeholder" data-card-name="${card.name}">🃏</div>
                     <div class="card-info">
@@ -408,3 +409,4 @@ class TarotApp {
 document.addEventListener('DOMContentLoaded', () => {
     window.tarotApp = new TarotApp();
 });
+

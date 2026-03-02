@@ -83,7 +83,7 @@ const TAROT_DECK = [
     { name: "9 Пентаклей", meaning: "Изобилие, роскошь, самообеспечение", image: "images/pents09.jpg", type: "pentacles" },
     { name: "10 Пентаклей", meaning: "Богатство, наследие, семья", image: "images/pents10.jpg", type: "pentacles" },
     { name: "Паж Пентаклей", meaning: "Изучение, усердие, потенциал", image: "images/pents11.jpg", type: "pentacles" },
-    { name: "Рыцарь Пентаклей", meaning: "Трудолюбие, надежность, ответственность", image: "images/pents12.jpg.jpg", type: "pentacles" },
+    { name: "Рыцарь Пентаклей", meaning: "Трудолюбие, надежность, ответственность", image: "images/pents12.jpg", type: "pentacles" },
     { name: "Королева Пентаклей", meaning: "Изобилие, комфорт, безопасность", image: "images/pents13.jpg", type: "pentacles" },
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
@@ -192,7 +192,8 @@ class TarotApp {
 
     generateCards() {
         let availableCards = [...TAROT_DECK];
-        this.currentCards = this.shuffleArray([...availableCards]);
+        // Берем ровно 5 случайных карт из полной колоды
+        this.currentCards = this.shuffleArray([...availableCards]).slice(0, 5);
         this.renderCards();
     }
 
@@ -231,13 +232,9 @@ class TarotApp {
         cardElement.dataset.cardIndex = index;
         cardElement.dataset.cardName = card.name;
 
-        const hasError = this.imageLoadErrors.has(card.image);
-
         cardElement.innerHTML = `
             <div class="card-inner">
-                <div class="card-back">
-                    ${!this.cardBackLoaded ? '<div class="fallback-placeholder">🃏</div>' : ''}
-                </div>
+                <div class="card-back"></div>
                 <div class="card-front">
                     <img src="${card.image}" alt="${card.name}" class="card-image">
                     <div class="card-info">
@@ -268,23 +265,21 @@ class TarotApp {
     }
 
     toggleCard(card, cardElement) {
-        const isFlipped = cardElement.classList.contains('flipped');
         const isSelected = this.selectedCards.some(c => c.name === card.name);
 
-        if (isFlipped) {
-            if (isSelected) {
-                this.deselectCard(card, cardElement);
-            } else {
-                this.flipBack(cardElement);
-            }
+        if (isSelected) {
+            // Если уже выбрана — снимаем выбор
+            this.deselectCard(card, cardElement);
         } else {
+            // Если еще не выбрано и лимит не достигнут — добавляем
             this.flipCard(card, cardElement);
         }
     }
 
     flipCard(card, cardElement) {
-        if (this.selectedCards.length >= 5) {
-            this.showError('Максимум 5 карт!');
+        // Проверяем лимит: максимум 3 карты из 5
+        if (this.selectedCards.length >= 3) {
+            this.showError('Максимум 3 карты! Выберите 3 из предложенных 5.');
             return;
         }
 
@@ -329,7 +324,7 @@ class TarotApp {
         const counter = document.getElementById('selectedCount');
         if (counter) {
             counter.textContent = this.selectedCards.length;
-            if (this.selectedCards.length === 5) {
+            if (this.selectedCards.length === 3) {
                 counter.classList.add('highlight');
             }
         }
@@ -338,8 +333,8 @@ class TarotApp {
     updateSubmitButton() {
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) {
-            submitBtn.disabled = this.selectedCards.length !== 5;
-            submitBtn.textContent = this.selectedCards.length === 5 ? '🎯 Отправить расклад' : `📨 Отправить (${this.selectedCards.length}/5)`;
+            submitBtn.disabled = this.selectedCards.length !== 3;
+            submitBtn.textContent = this.selectedCards.length === 3 ? '🎯 Отправить расклад' : `📨 Выбери ещё (${this.selectedCards.length}/3)`;
         }
     }
 
@@ -391,17 +386,16 @@ class TarotApp {
     }
 
     submitCards() {
-        if (this.selectedCards.length !== 5) {
-            this.showError('Выберите ровно 5 карт!');
+        if (this.selectedCards.length !== 3) {
+            this.showError('Выберите ровно 3 карты из 5!');
             return;
         }
 
         const result = {
             question: this.question,
             cards: this.selectedCards.map(card => card.name),
-            deck_type: this.deckType,
-            timestamp: new Date().toISOString(),
-            positions: [1, 2, 3, 4, 5]
+            total_cards_available: 5,
+            positions: [1, 2, 3]
         };
 
         console.log('✅ Данные отправлены:', result);

@@ -88,6 +88,7 @@ const TAROT_DECK = [
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
 
+
 class TarotApp {
     constructor() {
         this.selectedCards = [];
@@ -106,10 +107,12 @@ class TarotApp {
         this.preloadAssets();
         this.generateCards();
         this.setupEventListeners();
+        
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
         }
+        
         console.log('🌙 Web App запущен:', window.location.href);
     }
 
@@ -329,9 +332,15 @@ class TarotApp {
     }
 
     showError(message) {
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.showPopup({ title: 'Внимание', message, buttons: [{ type: 'ok' }] });
-        } else { alert(message); }
+        // ✅ ИСПРАВЛЕНИЕ: showPopup → showAlert (поддержка Telegram Web App v6+)
+        if (window.Telegram?.WebApp && typeof window.Telegram.WebApp.showAlert === 'function') {
+            window.Telegram.WebApp.showAlert(message);
+        } else {
+            // Fallback для обычного браузера или старых версий
+            if (typeof window.alert === 'function') {
+                window.alert(message);
+            }
+        }
     }
 
     setupEventListeners() {
@@ -360,7 +369,11 @@ class TarotApp {
         if (window.Telegram?.WebApp) {
             try {
                 window.Telegram.WebApp.sendData(JSON.stringify(result));
-                setTimeout(() => { window.Telegram.WebApp.close(); }, 1000);
+                setTimeout(() => { 
+                    if (window.Telegram?.WebApp) {
+                        window.Telegram.WebApp.close();
+                    }
+                }, 1000);
             } catch (error) {
                 console.error('Ошибка отправки:', error);
                 this.showError('Ошибка отправки.');

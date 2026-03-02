@@ -96,6 +96,7 @@ class TarotApp {
         this.cardBackLoaded = false;
         this.backgroundLoaded = false;
         this.isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        this.imageCacheKey = Date.now();
         this.init();
     }
 
@@ -105,11 +106,11 @@ class TarotApp {
         this.preloadAssets();
         this.generateCards();
         this.setupEventListeners();
-        
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
         }
+        console.log('🌙 Web App запущен:', window.location.href);
     }
 
     getQuestionFromUrl() {
@@ -127,7 +128,7 @@ class TarotApp {
     }
 
     preloadAssets() {
-        console.log('🔄 Предзагрузка активов...');
+        console.log('🔄 Предзагрузка активов...', this.imageCacheKey);
         this.loadCardBack();
         this.loadBackground();
     }
@@ -144,7 +145,7 @@ class TarotApp {
             this.cardBackLoaded = false;
             this.updateCardBacks();
         };
-        img.src = 'images/card_back.jpg';
+        img.src = 'images/card_back.jpg?t=' + this.imageCacheKey;
     }
 
     loadBackground() {
@@ -159,7 +160,7 @@ class TarotApp {
             this.backgroundLoaded = false; 
             this.applyBackground();
         };
-        img.src = 'images/back.jpg';
+        img.src = 'images/back.jpg?t=' + this.imageCacheKey;
     }
 
     updateCardBacks() {
@@ -167,7 +168,7 @@ class TarotApp {
         cardBacks.forEach(back => {
             if (this.cardBackLoaded) {
                 back.classList.remove('fallback');
-                back.style.backgroundImage = 'url("images/card_back.jpg")';
+                back.style.backgroundImage = 'url("images/card_back.jpg?t=' + this.imageCacheKey + '")';
             } else {
                 back.classList.add('fallback');
                 back.style.backgroundImage = '';
@@ -178,7 +179,7 @@ class TarotApp {
     applyBackground() {
         if (this.backgroundLoaded) {
             document.body.classList.add('has-bg-image');
-            document.body.style.backgroundImage = 'url("images/back.jpg")';
+            document.body.style.backgroundImage = 'url("images/back.jpg?t=' + this.imageCacheKey + '")';
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundRepeat = 'no-repeat';
@@ -193,6 +194,8 @@ class TarotApp {
     }
 
     generateCards() {
+        this.imageCacheKey = Date.now();
+        console.log('💥 Новые карты! Cache Key:', this.imageCacheKey);
         let availableCards = [...TAROT_DECK];
         this.currentCards = this.shuffleArray([...availableCards]).slice(0, 5);
         this.renderCards();
@@ -210,17 +213,13 @@ class TarotApp {
     renderCards() {
         const container = document.getElementById('cardsContainer');
         if (!container) { console.error("❌ Контейнер не найден"); return; }
-
+        console.log('📝 Рендерим карты. Cache Key:', this.imageCacheKey);
         container.innerHTML = '';
         this.currentCards.forEach((card, index) => {
             const cardElement = this.createCardElement(card, index);
             if (cardElement) container.appendChild(cardElement);
-            
-            setTimeout(() => {
-                cardElement.classList.add('fade-in');
-            }, index * 50);
+            setTimeout(() => { cardElement.classList.add('fade-in'); }, index * 50);
         });
-
         this.updateSubmitButton();
     }
 
@@ -228,13 +227,12 @@ class TarotApp {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
         cardElement.dataset.cardName = card.name;
-
-        // ВАЖНОЕ ИЗМЕНЕНИЕ: Новая HTML структура
+        const imageUrl = card.image + '?t=' + this.imageCacheKey;
         cardElement.innerHTML = `
             <div class="card-inner">
-                <div class="card-side card-back"></div>
-                <div class="card-side card-front">
-                    <img src="${card.image}" alt="${card.name}" class="card-image" data-card-name="${card.name}">
+                <div class="card-back"></div>
+                <div class="card-front">
+                    <img src="${imageUrl}" alt="${card.name}" class="card-image" data-card-name="${card.name}">
                     <div class="card-placeholder" data-card-name="${card.name}">🃏</div>
                     <div class="card-info">
                         <div class="card-name">${this.getShortName(card.name)}</div>
@@ -243,10 +241,8 @@ class TarotApp {
                 </div>
             </div>
         `;
-
         const img = cardElement.querySelector('.card-image');
         const placeholder = cardElement.querySelector('.card-placeholder');
-
         if (img) {
             img.addEventListener('load', () => {
                 console.log(`✅ Карта загружена: ${card.name}`);
@@ -254,9 +250,8 @@ class TarotApp {
                 if (placeholder) placeholder.style.display = 'none';
                 if (img) img.style.display = 'block';
             });
-
             img.addEventListener('error', () => {
-                console.warn(`❌ Ошибка загрузки: ${card.image}`);
+                console.warn(`❌ Ошибка загрузки: ${imageUrl}`);
                 cardElement.classList.add('card-has-error');
                 if (placeholder) placeholder.style.display = 'flex';
                 if (img) img.style.display = 'none';
@@ -265,7 +260,6 @@ class TarotApp {
             cardElement.classList.add('card-has-error');
             if (placeholder) placeholder.style.display = 'flex';
         }
-
         cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));
         return cardElement;
     }
@@ -276,12 +270,8 @@ class TarotApp {
 
     toggleCard(card, cardElement) {
         const isSelected = this.selectedCards.some(c => c.name === card.name);
-
-        if (isSelected) {
-            this.deselectCard(card, cardElement);
-        } else {
-            this.flipCard(card, cardElement);
-        }
+        if (isSelected) this.deselectCard(card, cardElement);
+        else this.flipCard(card, cardElement);
     }
 
     flipCard(card, cardElement) {
@@ -289,10 +279,8 @@ class TarotApp {
             this.showError('Максимум 3 карты! Выберите 3 из 5.');
             return;
         }
-
         cardElement.classList.add('flipped', 'selected');
         this.selectedCards.push(card);
-        
         this.animateSelection(cardElement);
         this.updateCounter();
         this.updateSubmitButton();
@@ -303,7 +291,6 @@ class TarotApp {
         cardElement.classList.remove('selected');
         cardElement.classList.remove('flipped');
         this.selectedCards = this.selectedCards.filter(c => c.name !== card.name);
-        
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
@@ -333,12 +320,9 @@ class TarotApp {
     updateResults() {
         const resultsContainer = document.getElementById('resultsContainer');
         const list = document.getElementById('selectedCardsList');
-
         if (this.selectedCards.length > 0) {
             resultsContainer.style.display = 'block';
-            list.innerHTML = this.selectedCards.map(card => 
-                `<div class="selected-card-item">${this.getShortName(card.name)}</div>`
-            ).join('');
+            list.innerHTML = this.selectedCards.map(card => `<div class="selected-card-item">${this.getShortName(card.name)}</div>`).join('');
         } else {
             resultsContainer.style.display = 'none';
         }
@@ -347,15 +331,12 @@ class TarotApp {
     showError(message) {
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.showPopup({ title: 'Внимание', message, buttons: [{ type: 'ok' }] });
-        } else {
-            alert(message);
-        }
+        } else { alert(message); }
     }
 
     setupEventListeners() {
         document.getElementById('submitBtn')?.addEventListener('click', () => this.submitCards());
         document.getElementById('shuffleBtn')?.addEventListener('click', () => this.shuffleCards());
-
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
             const lastTouchEnd = this.lastTouchEnd || 0;
@@ -369,16 +350,13 @@ class TarotApp {
             this.showError('Выберите ровно 3 карты!');
             return;
         }
-
         const result = {
             question: this.question,
             cards: this.selectedCards.map(card => card.name),
             total_available: 5,
             positions: [1, 2, 3]
         };
-
         console.log('✅ Отправка:', JSON.stringify(result, null, 2));
-
         if (window.Telegram?.WebApp) {
             try {
                 window.Telegram.WebApp.sendData(JSON.stringify(result));
@@ -391,22 +369,25 @@ class TarotApp {
     }
 
     shuffleCards() {
+        console.log('🔄 Перемешиваем карты...');
         this.selectedCards = [];
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
-
         const cards = document.querySelectorAll('.card');
         cards.forEach((card, index) => {
-            card.style.animation = 'shake 0.3s ease';
-            setTimeout(() => { card.style.animation = ''; }, 300);
+            card.style.opacity = '0.7';
+            setTimeout(() => { 
+                card.style.opacity = ''; 
+            }, 400);
         });
-
-        setTimeout(() => { this.generateCards(); }, 400);
+        setTimeout(() => { 
+            this.generateCards(); 
+        }, 400);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🌙 DOM Content Loaded');
     window.tarotApp = new TarotApp();
 });
-

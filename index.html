@@ -16,6 +16,9 @@
             scroll-behavior: smooth;
         }
 
+        @keyframes bgSlowMove { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
+        body.has-bg-image { animation: bgSlowMove 60s ease infinite alternate; }
+
         .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
 
         .header {

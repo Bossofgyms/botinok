@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #0a0a0f;
@@ -17,14 +16,14 @@
             scroll-behavior: smooth;
         }
 
-        .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
-
         @keyframes bgSlowMove {
             from { background-position: 0% 0%; }
             to { background-position: 100% 100%; }
         }
 
         body.has-bg-image { animation: bgSlowMove 60s ease infinite alternate; }
+
+        .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
 
         .header {
             text-align: center;
@@ -102,7 +101,7 @@
             align-items: center;
         }
 
-        /* === КАРТА С РУБАШКОЙ (ИСПРАВЛЕНА!) === */
+        /* === КАРТА С РУБАШКОЙ — НОВАЯ СТРУКТУРА === */
         .card {
             width: 80px;
             height: 130px;
@@ -114,13 +113,14 @@
         }
 
         .card-inner {
-            position: relative;  /* ВАЖНО: не absolute! */
+            position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            will-change: transform;
         }
 
         .card.flipped .card-inner { 
@@ -132,17 +132,18 @@
             filter: brightness(1.15); 
         }
 
-        .card-front, .card-back {
+        /* ОБЕ СТОРОНЫ КАРТЫ */
+        .card-side {
             position: absolute;
-            width: 100%; 
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            top: 0; left: 0;
-            backface-visibility: hidden;
             border-radius: 10px;
             overflow: hidden;
         }
 
-        /* --- РУБАШКА КАРТЫ --- */
+        /* --- ЗАДНЯЯ СТОРОНА (РУБАШКА) --- */
         .card-back {
             background-color: #2a2a3e;
             background-size: cover;
@@ -157,16 +158,13 @@
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
         }
 
-        /* --- ЛИЦЕВАЯ СТОРОНА (ИСПРАВЛЕНО!) --- */
+        /* --- ПЕРЕДНЯЯ СТОРОНА (ИСПРАВЛЕНО!) --- */
         .card-front {
             background: #1a1a2e;
-            transform: rotateY(180deg);
-            display: flex;
-            flex-direction: column;
             border: 3px solid #8B4513;
         }
 
-        .card-image {
+        .card-front img {
             width: 100%;
             height: 88%;
             object-fit: cover;
@@ -190,6 +188,7 @@
         .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; }
         .card-meaning { font-size: 6px; line-height: 1.1; text-align: center; opacity: 0.8; }
 
+        /* Заглушка при ошибке загрузки */
         .card-placeholder {
             display: none !important;
             width: 100%;
@@ -198,8 +197,6 @@
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            position: absolute;
-            top: 0; left: 0;
         }
 
         .card-has-error .card-placeholder { display: flex !important; }

@@ -86,9 +86,12 @@ let currentCards = [];
 let question = '';
 let cardBackLoaded = false;
 let bgLoaded = false;
+let assetsReady = false; // ✅ Флаг готовности активов
 
 // === ИНИЦИАЛИЗАЦИЯ ===
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Инициализация приложения...');
+    
     // Telegram WebApp
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.ready();
@@ -102,8 +105,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('questionText').textContent = 
         question.length > 80 ? question.substring(0, 80) + '...' : question;
     
-    // ✅ ИСПРАВЛЕНО: Предзагрузка рубашки и фона ПЕРЕД генерацией карт
+    // ✅ ИСПРАВЛЕНО: Предзагрузка активов ПЕРЕД любой генерацией карт
     preloadAssets(function() {
+        assetsReady = true;
+        console.log('✅ Активы готовы, генерируем карты...');
         generateCards();
     });
     
@@ -114,26 +119,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // === ПРЕДЗАГРУЗКА АКТИВОВ (РУБАШКА + ФОН) ===
 function preloadAssets(callback) {
+    console.log('🔄 Предзагрузка активов...');
     let loaded = 0;
     const total = 2;
     
     function checkDone() {
         loaded++;
-        if (loaded >= total && callback) callback();
+        console.log(`⏳ Загружено активов: ${loaded}/${total}`);
+        if (loaded >= total) {
+            console.log('✅ Все активы загружены');
+            if (callback) callback();
+        }
     }
     
     // 1. Загрузка рубашки карт
     const cardBack = new Image();
     cardBack.onload = function() {
         cardBackLoaded = true;
-        applyCardBacks();
-        console.log('✅ Рубашка загружена');
+        console.log('✅ Рубашка загружена: images/card_back.jpg');
         checkDone();
     };
     cardBack.onerror = function() {
         cardBackLoaded = false;
-        applyCardBacks(); // Применяет fallback
-        console.log('⚠️ Рубашка не загружена, используется fallback');
+        console.warn('⚠️ Рубашка НЕ загружена, будет fallback');
         checkDone();
     };
     cardBack.src = 'images/card_back.jpg';
@@ -143,13 +151,13 @@ function preloadAssets(callback) {
     bg.onload = function() {
         bgLoaded = true;
         applyBackground();
-        console.log('✅ Фон загружен');
+        console.log('✅ Фон загружен: images/back.jpg');
         checkDone();
     };
     bg.onerror = function() {
         bgLoaded = false;
-        applyBackground(); // Применяет градиент
-        console.log('⚠️ Фон не загружен, используется градиент');
+        applyBackground();
+        console.warn('⚠️ Фон НЕ загружен, будет градиент');
         checkDone();
     };
     bg.src = 'images/back.jpg';
@@ -158,10 +166,15 @@ function preloadAssets(callback) {
 // === ПРИМЕНЕНИЕ РУБАШКИ К КАРТАМ ===
 function applyCardBacks() {
     const backs = document.querySelectorAll('.card-back');
+    console.log(`🎴 Применяем рубашку к ${backs.length} картам...`);
+    
     backs.forEach(function(back) {
         if (cardBackLoaded) {
             back.classList.remove('fallback');
             back.style.backgroundImage = 'url("images/card_back.jpg")';
+            back.style.backgroundSize = 'cover';
+            back.style.backgroundPosition = 'center';
+            back.style.backgroundRepeat = 'no-repeat';
         } else {
             back.classList.add('fallback');
             back.style.backgroundImage = '';
@@ -173,9 +186,15 @@ function applyCardBacks() {
 function applyBackground() {
     if (bgLoaded) {
         document.body.classList.add('has-bg-image');
+        document.body.style.backgroundImage = 'url("images/back.jpg")';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+        console.log('✅ Фон применён к body');
     } else {
         document.body.classList.remove('has-bg-image');
         document.body.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e 0%, #0a0a0f 100%)';
+        console.log('✅ Градиент применён к body');
     }
 }
 
@@ -192,6 +211,12 @@ function shuffleArray(array) {
 // === ГЕНЕРАЦИЯ КАРТ ===
 function generateCards() {
     const container = document.getElementById('cardsContainer');
+    if (!container) {
+        console.error('❌ Контейнер карт не найден!');
+        return;
+    }
+    
+    console.log('🎴 Генерация новых карт...');
     container.innerHTML = '';
     
     currentCards = shuffleArray(TAROT_DECK).slice(0, 5);
@@ -212,8 +237,12 @@ function generateCards() {
         }, index * 50);
     });
     
-    // ✅ ВАЖНО: Применяем рубашку после создания новых карт
-    applyCardBacks();
+    // ✅ КРИТИЧНО: Применяем рубашку ПОСЛЕ того как карты добавлены в DOM
+    setTimeout(function() {
+        applyCardBacks();
+        console.log('✅ Рубашка применена после генерации');
+    }, 100);
+    
     updateUI();
 }
 
@@ -223,9 +252,12 @@ function createCardElement(card) {
     cardEl.className = 'card';
     cardEl.dataset.cardName = card.name;
     
+    // ✅ Сразу добавляем класс fallback если рубашка ещё не загружена
+    const fallbackClass = cardBackLoaded ? '' : ' fallback';
+    
     cardEl.innerHTML = 
         '<div class="card-inner">' +
-            '<div class="card-back' + (cardBackLoaded ? '' : ' fallback') + '"></div>' +
+            '<div class="card-back' + fallbackClass + '"></div>' +
             '<div class="card-front">' +
                 '<img src="' + card.image + '" alt="' + card.name + '" class="card-image">' +
                 '<div class="card-placeholder">🃏</div>' +
@@ -240,17 +272,21 @@ function createCardElement(card) {
     const img = cardEl.querySelector('.card-image');
     const placeholder = cardEl.querySelector('.card-placeholder');
     
-    img.addEventListener('load', function() {
-        cardEl.classList.remove('card-has-error');
-        placeholder.style.display = 'none';
-        img.style.display = 'block';
-    });
-    
-    img.addEventListener('error', function() {
-        cardEl.classList.add('card-has-error');
-        placeholder.style.display = 'flex';
-        img.style.display = 'none';
-    });
+    if (img) {
+        img.addEventListener('load', function() {
+            cardEl.classList.remove('card-has-error');
+            if (placeholder) placeholder.style.display = 'none';
+            img.style.display = 'block';
+            console.log(`✅ Изображение загружено: ${card.name}`);
+        });
+        
+        img.addEventListener('error', function() {
+            cardEl.classList.add('card-has-error');
+            if (placeholder) placeholder.style.display = 'flex';
+            if (img) img.style.display = 'none';
+            console.warn(`❌ Изображение НЕ загружено: ${card.image}`);
+        });
+    }
     
     // Обработчик клика
     cardEl.addEventListener('click', function() {
@@ -270,11 +306,13 @@ function handleCardClick(card, cardEl) {
         selectedCards = selectedCards.filter(function(c) { 
             return c.name !== card.name; 
         });
+        console.log(`❌ Снята карта: ${card.name}`);
     } else {
         // Переворачиваем и выбираем
         if (selectedCards.length < 3) {
             cardEl.classList.add('flipped', 'selected');
             selectedCards.push(card);
+            console.log(`✅ Выбрана карта: ${card.name}`);
         } else {
             if (window.Telegram?.WebApp) {
                 window.Telegram.WebApp.showPopup({
@@ -301,24 +339,32 @@ function updateUI() {
     document.getElementById('selectedCount').textContent = selectedCards.length;
     
     const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = selectedCards.length !== 3;
+    if (submitBtn) {
+        submitBtn.disabled = selectedCards.length !== 3;
+    }
     
     const resultsContainer = document.getElementById('resultsContainer');
     const selectedList = document.getElementById('selectedCardsList');
     
     if (selectedCards.length > 0) {
-        resultsContainer.classList.add('show');
-        selectedList.innerHTML = selectedCards.map(function(card) {
-            return '<div class="selected-card-item">' + getShortName(card.name) + '</div>';
-        }).join('');
+        if (resultsContainer) resultsContainer.classList.add('show');
+        if (selectedList) {
+            selectedList.innerHTML = selectedCards.map(function(card) {
+                return '<div class="selected-card-item">' + getShortName(card.name) + '</div>';
+            }).join('');
+        }
     } else {
-        resultsContainer.classList.remove('show');
+        if (resultsContainer) resultsContainer.classList.remove('show');
     }
 }
 
 // === ПЕРЕМЕШАТЬ КАРТЫ ===
 function shuffleCards() {
+    console.log('🔄 Перемешивание карт...');
+    
+    // Сброс выбора
     selectedCards = [];
+    updateUI();
     
     // Анимация перемешивания
     const cards = document.querySelectorAll('.card');
@@ -330,10 +376,11 @@ function shuffleCards() {
         }, 200 + index * 30);
     });
     
-    // Перегенерация
+    // ✅ КРИТИЧНО: Перегенерация ТОЛЬКО после завершения анимации
     setTimeout(function() {
         generateCards();
-    }, 300);
+        console.log('✅ Перемешивание завершено');
+    }, 400);
 }
 
 // === ОТПРАВКА РАСКЛАДА ===
@@ -363,7 +410,7 @@ function submitCards() {
         timestamp: new Date().toISOString()
     };
     
-    console.log('Отправка:', JSON.stringify(result, null, 2));
+    console.log('📨 Отправка:', JSON.stringify(result, null, 2));
     
     if (window.Telegram?.WebApp) {
         try {

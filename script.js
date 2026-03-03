@@ -1,3 +1,4 @@
+// === ПАКЕТ ДАННЫХ КАРТ ===
 const TAROT_DECK = [
     // СТАРШИЕ АРКАНЫ (22 карты)
     { name: "0. Шут", meaning: "Начало, невинность, спонтанность", image: "images/fool.jpg", type: "major" },
@@ -88,6 +89,7 @@ const TAROT_DECK = [
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
 
+// === ПРИЛОЖЕНИЕ ТАРО ===
 class TarotApp {
     constructor() {
         this.selectedCards = [];
@@ -96,6 +98,7 @@ class TarotApp {
         this.cardBackLoaded = false;
         this.backgroundLoaded = false;
         this.isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        this.isAnimating = false;
         this.init();
     }
 
@@ -110,6 +113,8 @@ class TarotApp {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
         }
+
+        console.log('✅ Приложение Таро инициализировано');
     }
 
     getQuestionFromUrl() {
@@ -140,7 +145,7 @@ class TarotApp {
             this.updateCardBacks();
         };
         img.onerror = () => {
-            console.warn('❌ Рубашка карт НЕ загружена');
+            console.warn('❌ Рубашка карт НЕ загружена, используйте fallback');
             this.cardBackLoaded = false;
             this.updateCardBacks();
         };
@@ -155,7 +160,7 @@ class TarotApp {
             this.applyBackground();
         };
         img.onerror = () => { 
-            console.warn('❌ Фон НЕ загружен'); 
+            console.warn('❌ Фон НЕ загружен, используйте градиент'); 
             this.backgroundLoaded = false; 
             this.applyBackground();
         };
@@ -186,6 +191,7 @@ class TarotApp {
             document.body.style.backgroundBlendMode = 'overlay';
             document.body.style.backgroundOrigin = 'content-box';
         } else {
+            document.body.classList.remove('has-bg-image');
             document.body.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e, #0a0a0f)';
             document.body.style.backgroundAttachment = 'fixed';
             document.body.style.backgroundBlendMode = 'normal';
@@ -193,6 +199,7 @@ class TarotApp {
     }
 
     generateCards() {
+        console.log('🎴 Генерация карт...');
         let availableCards = [...TAROT_DECK];
         this.currentCards = this.shuffleArray([...availableCards]).slice(0, 5);
         this.renderCards();
@@ -209,19 +216,25 @@ class TarotApp {
 
     renderCards() {
         const container = document.getElementById('cardsContainer');
-        if (!container) { console.error("❌ Контейнер не найден"); return; }
+        if (!container) { 
+            console.error("❌ Контейнер карт не найден"); 
+            return; 
+        }
 
         container.innerHTML = '';
         this.currentCards.forEach((card, index) => {
             const cardElement = this.createCardElement(card, index);
-            if (cardElement) container.appendChild(cardElement);
-            
-            setTimeout(() => {
-                cardElement.classList.add('fade-in');
-            }, index * 50);
+            if (cardElement) {
+                container.appendChild(cardElement);
+                
+                setTimeout(() => {
+                    cardElement.classList.add('fade-in');
+                }, index * 50);
+            }
         });
 
         this.updateSubmitButton();
+        this.updateResults();
     }
 
     createCardElement(card, index) {
@@ -231,7 +244,7 @@ class TarotApp {
 
         cardElement.innerHTML = `
             <div class="card-inner">
-                <div class="card-back"></div>
+                <div class="card-back ${!this.cardBackLoaded ? 'fallback' : ''}"></div>
                 <div class="card-front">
                     <img src="${card.image}" alt="${card.name}" class="card-image" data-card-name="${card.name}">
                     <div class="card-placeholder" data-card-name="${card.name}">🃏</div>
@@ -289,6 +302,9 @@ class TarotApp {
             return;
         }
 
+        if (this.isAnimating) return;
+        this.isAnimating = true;
+
         cardElement.classList.add('flipped', 'selected');
         this.selectedCards.push(card);
         
@@ -296,6 +312,8 @@ class TarotApp {
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
+
+        setTimeout(() => { this.isAnimating = false; }, 300);
     }
 
     deselectCard(card, cardElement) {
@@ -310,7 +328,9 @@ class TarotApp {
 
     animateSelection(cardElement) {
         cardElement.style.transform = 'scale(1.1)';
-        setTimeout(() => { cardElement.style.transform = 'scale(1)'; }, 150);
+        setTimeout(() => { 
+            cardElement.style.transform = 'scale(1)'; 
+        }, 150);
     }
 
     updateCounter() {
@@ -334,12 +354,12 @@ class TarotApp {
         const list = document.getElementById('selectedCardsList');
 
         if (this.selectedCards.length > 0) {
-            resultsContainer.style.display = 'block';
+            resultsContainer.classList.add('show');
             list.innerHTML = this.selectedCards.map(card => 
                 `<div class="selected-card-item">${this.getShortName(card.name)}</div>`
             ).join('');
         } else {
-            resultsContainer.style.display = 'none';
+            resultsContainer.classList.remove('show');
         }
     }
 
@@ -352,8 +372,15 @@ class TarotApp {
     }
 
     setupEventListeners() {
-        document.getElementById('submitBtn')?.addEventListener('click', () => this.submitCards());
-        document.getElementById('shuffleBtn')?.addEventListener('click', () => this.shuffleCards());
+        document.getElementById('submitBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.submitCards();
+        });
+
+        document.getElementById('shuffleBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shuffleCards();
+        });
 
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
@@ -369,9 +396,16 @@ class TarotApp {
             return;
         }
 
+        if (this.isAnimating) return;
+        this.isAnimating = true;
+
         const result = {
             question: this.question,
-            cards: this.selectedCards.map(card => card.name),
+            cards: this.selectedCards.map(card => ({
+                name: card.name,
+                short_name: this.getShortName(card.name),
+                meaning: card.meaning
+            })),
             total_available: 5,
             positions: [1, 2, 3]
         };
@@ -384,27 +418,50 @@ class TarotApp {
                 setTimeout(() => { window.Telegram.WebApp.close(); }, 1000);
             } catch (error) {
                 console.error('Ошибка отправки:', error);
-                this.showError('Ошибка отправки.');
+                this.showError('Ошибка отправки данных.');
             }
+        } else {
+            console.log('Результат (Telegram не найден):', result);
+            this.showError('Для работы требуется Telegram Web App');
         }
     }
 
     shuffleCards() {
+        console.log('🔄 Перемешивание...');
+        
+        this.isAnimating = true;
+        
+        // Очищаем выбранные карты
         this.selectedCards = [];
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
 
+        // Анимация тряски всех карт
         const cards = document.querySelectorAll('.card');
         cards.forEach((card, index) => {
-            card.style.animation = 'shake 0.3s ease';
-            setTimeout(() => { card.style.animation = ''; }, 300);
+            card.classList.add('shake');
+            setTimeout(() => { card.classList.remove('shake'); }, 300);
+            
+            // Сброс всех карт к начальному состоянию
+            card.classList.remove('flipped', 'selected');
         });
 
-        setTimeout(() => { this.generateCards(); }, 400);
+        // Новая генерация после завершения анимации
+        setTimeout(() => { 
+            this.generateCards();
+            setTimeout(() => { this.isAnimating = false; }, 500);
+        }, 500);
     }
 }
 
+// === ЗАПУСК ПРИЛОЖЕНИЯ ===
 document.addEventListener('DOMContentLoaded', () => {
-    window.tarotApp = new TarotApp();
+    console.log('📄 DOM готов, запускаем приложение...');
+    try {
+        window.tarotApp = new TarotApp();
+    } catch (error) {
+        console.error('❌ Ошибка инициализации:', error);
+        document.getElementById('questionText').textContent = 'Ошибка загрузки приложения';
+    }
 });

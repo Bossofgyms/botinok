@@ -2,410 +2,102 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Таро Расклад</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таро Тест</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0a0a0f;
+            font-family: sans-serif;
+            background: #1a1a2e;
+            color: white;
             min-height: 100vh;
-            color: white;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            transition: background-image 0.3s ease;
-        }
-
-        .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 1; padding: 15px 10px; }
-
-        @keyframes bgSlowMove {
-            from { background-position: 0% 0%; }
-            to { background-position: 100% 100%; }
-        }
-
-        body.has-bg-image { animation: bgSlowMove 60s ease infinite alternate; }
-
-        /* --- ШАПКА --- */
-        .header {
-            text-align: center;
-            margin-bottom: 15px;
-            background: rgba(20, 20, 30, 0.7);
-            padding: 15px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-
-        .header h1 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
-            background: linear-gradient(90deg, #ffd700, #ffae00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .question {
-            background: rgba(255,255,255,0.15);
-            padding: 12px;
-            border-radius: 10px;
-            margin: 10px 0;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
-            line-height: 1.4;
-            max-height: 80px;
-            overflow-y: auto;
-            word-wrap: break-word;
-        }
-
-        .counter-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            margin-top: 10px;
+            padding: 20px;
         }
-
-        .counter {
-            font-size: 14px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #2F4F4F, #3A5A40);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .counter.highlight {
-            box-shadow: 0 0 15px rgba(255,215,0,0.5);
-            animation: pulse 1s ease infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        /* --- КОНТЕЙНЕР КАРТ --- */
-        .cards-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 10px 0;
-            scrollbar-width: thin;
-            scrollbar-color: #8B4513 #1c1c1e;
-            margin-bottom: 15px;
-        }
-
-        .cards-wrapper::-webkit-scrollbar { height: 6px; }
-        .cards-wrapper::-webkit-scrollbar-track { background: #1c1c1e; border-radius: 3px; }
-        .cards-wrapper::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 3px; }
-
         .cards-container {
             display: flex;
-            gap: 15px;
-            padding: 10px;
-            min-width: fit-content;
+            gap: 20px;
+            flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
+            margin: 20px 0;
         }
-
-        /* === КАРТА С РУБАШКОЙ (ИСПРАВЛЕНО 3D ВРАЩЕНИЕ) === */
+        /* === КАРТА === */
         .card {
-            width: 80px;
-            height: 130px;
-            perspective: 1000px;
+            width: 100px;
+            height: 160px;
+            position: relative; /* ⚠️ КРИТИЧНО: для absolute children */
             cursor: pointer;
-            touch-action: manipulation;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            flex-shrink: 0;
-            opacity: 0;
-            position: relative;
+            perspective: 1000px;
         }
-
-        .card.fade-in {
-            animation: fadeInCard 0.5s ease forwards;
-        }
-
-        @keyframes fadeInCard {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card.shake {
-            animation: shakeCard 0.3s ease;
-        }
-
-        @keyframes shakeCard {
-            0%, 100% { transform: rotateY(0deg) translateX(0); }
-            25% { transform: rotateY(10deg) translateX(-5px); }
-            75% { transform: rotateY(-10deg) translateX(5px); }
-        }
-
         .card-inner {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; /* ⚠️ БЫЛО absolute — МЕНЯЕМ на relative! */
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
             transform-style: preserve-3d;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
-
-        /* ✅ КЛАСС flipped ПЕРЕВОРАЧИВАЕТ КАРТОЧКУ НА 180° */
         .card.flipped .card-inner {
             transform: rotateY(180deg);
         }
-
-        .card.selected .card-inner {
-            box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 50px rgba(255,165,0,0.6);
-            filter: brightness(1.15);
-        }
-
-        /* === ОБЕ СТОРОНЫ КАРТЫ - ABSOLUTE POSITIONING === */
-        .card-back, .card-front {
+        .card-face {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
             border-radius: 10px;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            backface-visibility: hidden;
-            will-change: transform;
-        }
-
-        /* === РУБАШКА КАРТЫ === */
-        .card-back {
-            background-color: #2a2a3e;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
             border: 3px solid #8B4513;
-            z-index: 10;
-            backface-visibility: hidden;
         }
-
-        .card-back.fallback::after {
-            content: "🃏";
-            font-size: 42px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
+        /* Рубашка */
+        .card-back {
+            background: #2a2a3e;
+            font-size: 40px;
         }
-
-        /* === ЛИЦЕВАЯ СТОРОНА КАРТЫ === */
+        /* Лицо */
         .card-front {
             background: #1a1a2e;
             transform: rotateY(180deg);
-            display: flex;
             flex-direction: column;
-            border: 3px solid #8B4513;
-            z-index: 15;
-            backface-visibility: hidden;
+            padding: 5px;
         }
-
-        .card-image {
+        .card-front img {
             width: 100%;
-            height: 88%;
+            height: 85%;
             object-fit: contain;
-            object-position: center;
-            display: block;
-            flex-shrink: 0;
+            border-radius: 5px;
         }
-
-        .card-placeholder {
-            width: 100%;
-            height: 88%;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            position: absolute;
-            top: 0; left: 0;
-            display: none;
-            z-index: 1;
+        .card-name {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 5px;
         }
-
-        .card-has-error .card-placeholder { display: flex !important; }
-        .card-has-error .card-image { display: none !important; }
-
-        .card-info {
-            padding: 10px 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.9));
-            color: white;
-            gap: 3px;
-            border-radius: 0 0 10px 10px;
-            height: 12%;
-            flex-shrink: 0;
-        }
-
-        .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; }
-        .card-meaning { font-size: 6px; line-height: 1.1; text-align: center; opacity: 0.8; }
-
-        /* === РЕЗУЛЬТАТЫ === */
-        .results-container {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 12px;
-            margin: 15px 0;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            display: none;
-            transition: all 0.3s ease;
-        }
-
-        .results-container.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .results-title { 
-            font-size: 14px; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            text-align: center; 
-            color: #ffd700; 
-        }
-
-        .selected-cards { 
-            display: flex; 
-            justify-content: center; 
-            gap: 8px; 
-            flex-wrap: wrap; 
-        }
-
-        .selected-card-item {
-            background: linear-gradient(135deg, #2F4F4F, #3A5A40);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid rgba(255,255,255,0.2);
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* === КНОПКИ === */
-        .actions { 
-            display: flex; 
-            gap: 10px; 
-            margin: 15px 0; 
-        }
-
-        .submit-btn, .shuffle-btn {
-            padding: 14px;
+        .counter { margin: 10px; font-size: 16px; }
+        .btn {
+            padding: 12px 24px;
+            margin: 5px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 14px;
-            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .submit-btn {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
+            background: #ffd700;
             color: #2F4F4F;
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
         }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255,215,0,0.4);
-        }
-
-        .submit-btn:disabled { 
-            background: linear-gradient(45deg, #666, #888); 
-            color: #aaa; 
-            cursor: not-allowed; 
-            box-shadow: none; 
-        }
-        
-        .shuffle-btn { 
-            background: rgba(255,255,255,0.15); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.3); 
-            backdrop-filter: blur(10px); 
-        }
-
-        .shuffle-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-
-        .instructions { 
-            text-align: center; 
-            color: rgba(255,255,255,0.6); 
-            font-size: 12px; 
-            margin-top: 10px; 
-            padding: 10px; 
-            background: rgba(0,0,0,0.2); 
-            border-radius: 8px; 
-            line-height: 1.4; 
-        }
-
-        /* === МОБИЛЬНАЯ АДАПТАЦИЯ === */
-        @media (max-width: 375px) {
-            .card { width: 70px; height: 110px; }
-            .cards-container { gap: 12px; }
-            .card-name { font-size: 8px; }
-            .card-meaning { font-size: 5px; }
-        }
-
-        @media (min-width: 1024px) {
-            .card { width: 90px; height: 140px; }
-        }
+        .btn:disabled { background: #666; color: #aaa; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <div class="container fade-in">
-        <div class="header">
-            <h1>🔮 Таро Расклад</h1>
-            <div class="question"><strong>Вопрос:</strong> <span id="questionText">Загрузка...</span></div>
-            <div class="counter-container">
-                <div class="counter">Выбрано: <span id="selectedCount">0</span>/3 карт</div>
-            </div>
-        </div>
-
-        <div class="cards-wrapper" id="cardsWrapper">
-            <div id="cardsContainer" class="cards-container"></div>
-        </div>
-
-        <div id="resultsContainer" class="results-container">
-            <div class="results-title">✨ Выбранные карты:</div>
-            <div class="selected-cards" id="selectedCardsList"></div>
-        </div>
-
-        <div class="actions">
-            <button id="shuffleBtn" class="shuffle-btn">🔄 Перемешать</button>
-            <button id="submitBtn" class="submit-btn" disabled>📨 Отправить расклад (0 из 3)</button>
-        </div>
-
-        <div class="instructions">
-            💡 Нажми на карту — она перевернётся.<br>
-            Выбери <b>3 карты из 5</b> для твоего расклада.
-        </div>
-    </div>
+    <h2>🔮 Тест переворота карт</h2>
+    <div class="counter">Выбрано: <span id="count">0</span>/3</div>
+    
+    <div class="cards-container" id="container"></div>
+    
+    <button class="btn" id="shuffle">🔄 Перемешать</button>
+    <button class="btn" id="submit" disabled>📨 Отправить</button>
 
     <script src="script.js"></script>
 </body>

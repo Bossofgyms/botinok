@@ -115,7 +115,7 @@
             align-items: center;
         }
 
-        /* === КАРТА С РУБАШКОЙ (ИСПРАВЛЕНО) === */
+        /* === КАРТА С РУБАШКОЙ (ИСПРАВЛЕНО 3D ВРАЩЕНИЕ) === */
         .card {
             width: 80px;
             height: 130px;
@@ -124,8 +124,8 @@
             touch-action: manipulation;
             transition: transform 0.3s ease, opacity 0.3s ease;
             flex-shrink: 0;
-            transform-style: preserve-3d;
             opacity: 0;
+            position: relative;
         }
 
         .card.fade-in {
@@ -142,22 +142,22 @@
         }
 
         @keyframes shakeCard {
-            0%, 100% { transform: rotateY(0deg); }
-            25% { transform: rotateY(10deg); }
-            75% { transform: rotateY(-10deg); }
+            0%, 100% { transform: rotateY(0deg) translateX(0); }
+            25% { transform: rotateY(10deg) translateX(-5px); }
+            75% { transform: rotateY(-10deg) translateX(5px); }
         }
 
         .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
 
-        /* ✅ ИСПРАВЛЕНИЕ: Класс flipped переворачивает карточку */
+        /* ✅ КЛАСС flipped ПЕРЕВОРАЧИВАЕТ КАРТОЧКУ НА 180° */
         .card.flipped .card-inner {
             transform: rotateY(180deg);
         }
@@ -167,18 +167,18 @@
             filter: brightness(1.15);
         }
 
-        /* === ОБЕ СТОРОНЫ КАРТЫ === */
+        /* === ОБЕ СТОРОНЫ КАРТЫ - ABSOLUTE POSITIONING === */
         .card-back, .card-front {
             position: absolute;
-            width: 100%;
-            height: 100%;
             top: 0; left: 0;
+            width: 100%; height: 100%;
             border-radius: 10px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            backface-visibility: hidden; /* ⚠️ Ключевой параметр! */
+            backface-visibility: hidden;
+            will-change: transform;
         }
 
         /* === РУБАШКА КАРТЫ === */
@@ -189,6 +189,7 @@
             background-repeat: no-repeat;
             border: 3px solid #8B4513;
             z-index: 10;
+            backface-visibility: hidden;
         }
 
         .card-back.fallback::after {
@@ -204,18 +205,17 @@
             display: flex;
             flex-direction: column;
             border: 3px solid #8B4513;
-            z-index: 20;
-            backface-visibility: hidden; /* ✅ Важно для корректного скрытия рубашки */
+            z-index: 15;
+            backface-visibility: hidden;
         }
 
         .card-image {
             width: 100%;
             height: 88%;
-            object-fit: contain; /* ✅ Исправлено с cover на contain */
+            object-fit: contain;
             object-position: center;
             display: block;
             flex-shrink: 0;
-            z-index: 15;
         }
 
         .card-placeholder {
@@ -228,7 +228,7 @@
             position: absolute;
             top: 0; left: 0;
             display: none;
-            z-index: 14;
+            z-index: 1;
         }
 
         .card-has-error .card-placeholder { display: flex !important; }

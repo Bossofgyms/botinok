@@ -1,6 +1,5 @@
 // === ПОЛНАЯ КОЛОДА ТАРО (78 карт) ===
 const TAROT_DECK = [
-    // СТАРШИЕ АРКАНЫ
     { name: "0. Шут", meaning: "Начало, спонтанность", image: "images/fool.jpg" },
     { name: "I. Маг", meaning: "Воля, мастерство", image: "images/magician.jpg" },
     { name: "II. Верховная Жрица", meaning: "Интуиция, тайны", image: "images/high_priestess.jpg" },
@@ -13,8 +12,8 @@ const TAROT_DECK = [
     { name: "IX. Отшельник", meaning: "Самоанализ, мудрость", image: "images/hermit.jpg" },
     { name: "X. Колесо Фортуны", meaning: "Судьба, циклы", image: "images/wheel.jpg" },
     { name: "XI. Справедливость", meaning: "Баланс, карма", image: "images/justice.jpg" },
-    { name: "XII. Повешенный", meaning: "Жертва, новая перспектива", image: "images/hanged.jpg" },
-    { name: "XIII. Смерть", meaning: "Трансформация, переход", image: "images/death.jpg" },
+    { name: "XII. Повешенный", meaning: "Жертва, перспектива", image: "images/hanged.jpg" },
+    { name: "XIII. Смерть", meaning: "Трансформация", image: "images/death.jpg" },
     { name: "XIV. Умеренность", meaning: "Баланс, терпение", image: "images/temperance.jpg" },
     { name: "XV. Дьявол", meaning: "Искушение, материализм", image: "images/devil.jpg" },
     { name: "XVI. Башня", meaning: "Внезапные изменения", image: "images/tower.jpg" },
@@ -23,8 +22,6 @@ const TAROT_DECK = [
     { name: "XIX. Солнце", meaning: "Радость, успех", image: "images/sun.jpg" },
     { name: "XX. Суд", meaning: "Возрождение, призыв", image: "images/judgement.jpg" },
     { name: "XXI. Мир", meaning: "Завершение, единство", image: "images/world.jpg" },
-    
-    // ЖЕЗЛЫ (14 карт)
     { name: "Туз Жезлов", meaning: "Вдохновение, энергия", image: "images/wands01.jpg" },
     { name: "2 Жезлов", meaning: "Планирование, решение", image: "images/wands02.jpg" },
     { name: "3 Жезлов", meaning: "Предвидение, расширение", image: "images/wands03.jpg" },
@@ -39,8 +36,6 @@ const TAROT_DECK = [
     { name: "Рыцарь Жезлов", meaning: "Приключение, импульс", image: "images/wands12.jpg" },
     { name: "Королева Жезлов", meaning: "Уверенность, харизма", image: "images/wands13.jpg" },
     { name: "Король Жезлов", meaning: "Лидерство, видение", image: "images/wands14.jpg" },
-    
-    // КУБКИ (14 карт)
     { name: "Туз Кубков", meaning: "Новая любовь, эмоции", image: "images/cups01.jpg" },
     { name: "2 Кубков", meaning: "Партнерство, союз", image: "images/cups02.jpg" },
     { name: "3 Кубков", meaning: "Праздник, дружба", image: "images/cups03.jpg" },
@@ -55,8 +50,6 @@ const TAROT_DECK = [
     { name: "Рыцарь Кубков", meaning: "Романтика, идеализм", image: "images/cups12.jpg" },
     { name: "Королева Кубков", meaning: "Забота, интуиция", image: "images/cups13.jpg" },
     { name: "Король Кубков", meaning: "Эмоциональный контроль", image: "images/cups14.jpg" },
-    
-    // МЕЧИ (14 карт)
     { name: "Туз Мечей", meaning: "Прорыв, ясность", image: "images/swords01.jpg" },
     { name: "2 Мечей", meaning: "Тупик, баланс", image: "images/swords02.jpg" },
     { name: "3 Мечей", meaning: "Боль, конфликт", image: "images/swords03.jpg" },
@@ -71,8 +64,6 @@ const TAROT_DECK = [
     { name: "Рыцарь Мечей", meaning: "Амбиции, прямота", image: "images/swords12.jpg" },
     { name: "Королева Мечей", meaning: "Ясность, принципы", image: "images/swords13.jpg" },
     { name: "Король Мечей", meaning: "Интеллект, истина", image: "images/swords14.jpg" },
-    
-    // ПЕНТАКЛИ (14 карт)
     { name: "Туз Пентаклей", meaning: "Процветание, возможность", image: "images/pents01.jpg" },
     { name: "2 Пентаклей", meaning: "Баланс, адаптация", image: "images/pents02.jpg" },
     { name: "3 Пентаклей", meaning: "Мастерство, сотрудничество", image: "images/pents03.jpg" },
@@ -93,6 +84,8 @@ const TAROT_DECK = [
 let selectedCards = [];
 let currentCards = [];
 let question = '';
+let cardBackLoaded = false;
+let bgLoaded = false;
 
 // === ИНИЦИАЛИЗАЦИЯ ===
 document.addEventListener('DOMContentLoaded', function() {
@@ -100,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
-        // Получаем вопрос из параметров
         const params = new URLSearchParams(window.location.search);
         question = params.get('question') ? decodeURIComponent(params.get('question')) : 'Вопрос не указан';
     } else {
@@ -110,31 +102,81 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('questionText').textContent = 
         question.length > 80 ? question.substring(0, 80) + '...' : question;
     
-    // Предзагрузка рубашки
-    preloadCardBack();
-    
-    // Генерация карт
-    generateCards();
+    // ✅ ИСПРАВЛЕНО: Предзагрузка рубашки и фона ПЕРЕД генерацией карт
+    preloadAssets(function() {
+        generateCards();
+    });
     
     // Обработчики кнопок
     document.getElementById('shuffleBtn').addEventListener('click', shuffleCards);
     document.getElementById('submitBtn').addEventListener('click', submitCards);
 });
 
-// === ПРЕДЗАГРУЗКА РУБАШКИ ===
-function preloadCardBack() {
-    const img = new Image();
-    img.onload = function() {
-        document.querySelectorAll('.card-back').forEach(function(back) {
+// === ПРЕДЗАГРУЗКА АКТИВОВ (РУБАШКА + ФОН) ===
+function preloadAssets(callback) {
+    let loaded = 0;
+    const total = 2;
+    
+    function checkDone() {
+        loaded++;
+        if (loaded >= total && callback) callback();
+    }
+    
+    // 1. Загрузка рубашки карт
+    const cardBack = new Image();
+    cardBack.onload = function() {
+        cardBackLoaded = true;
+        applyCardBacks();
+        console.log('✅ Рубашка загружена');
+        checkDone();
+    };
+    cardBack.onerror = function() {
+        cardBackLoaded = false;
+        applyCardBacks(); // Применяет fallback
+        console.log('⚠️ Рубашка не загружена, используется fallback');
+        checkDone();
+    };
+    cardBack.src = 'images/card_back.jpg';
+    
+    // 2. Загрузка фона
+    const bg = new Image();
+    bg.onload = function() {
+        bgLoaded = true;
+        applyBackground();
+        console.log('✅ Фон загружен');
+        checkDone();
+    };
+    bg.onerror = function() {
+        bgLoaded = false;
+        applyBackground(); // Применяет градиент
+        console.log('⚠️ Фон не загружен, используется градиент');
+        checkDone();
+    };
+    bg.src = 'images/back.jpg';
+}
+
+// === ПРИМЕНЕНИЕ РУБАШКИ К КАРТАМ ===
+function applyCardBacks() {
+    const backs = document.querySelectorAll('.card-back');
+    backs.forEach(function(back) {
+        if (cardBackLoaded) {
             back.classList.remove('fallback');
             back.style.backgroundImage = 'url("images/card_back.jpg")';
-        });
-    };
-    img.onerror = function() {
-        // fallback уже задан в CSS
-        console.log('Рубашка не загружена, используется fallback');
-    };
-    img.src = 'images/card_back.jpg';
+        } else {
+            back.classList.add('fallback');
+            back.style.backgroundImage = '';
+        }
+    });
+}
+
+// === ПРИМЕНЕНИЕ ФОНА К BODY ===
+function applyBackground() {
+    if (bgLoaded) {
+        document.body.classList.add('has-bg-image');
+    } else {
+        document.body.classList.remove('has-bg-image');
+        document.body.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e 0%, #0a0a0f 100%)';
+    }
 }
 
 // === ПЕРЕМЕШИВАНИЕ (Fisher-Yates) ===
@@ -152,7 +194,6 @@ function generateCards() {
     const container = document.getElementById('cardsContainer');
     container.innerHTML = '';
     
-    // Выбираем 5 случайных карт
     currentCards = shuffleArray(TAROT_DECK).slice(0, 5);
     
     currentCards.forEach(function(card, index) {
@@ -164,7 +205,6 @@ function generateCards() {
             cardEl.style.opacity = '0';
             cardEl.style.transform = 'translateY(10px)';
             cardEl.style.transition = 'all 0.3s ease';
-            
             setTimeout(function() {
                 cardEl.style.opacity = '1';
                 cardEl.style.transform = 'translateY(0)';
@@ -172,6 +212,8 @@ function generateCards() {
         }, index * 50);
     });
     
+    // ✅ ВАЖНО: Применяем рубашку после создания новых карт
+    applyCardBacks();
     updateUI();
 }
 
@@ -181,19 +223,34 @@ function createCardElement(card) {
     cardEl.className = 'card';
     cardEl.dataset.cardName = card.name;
     
-    // ✅ ВАЖНО: структура должна точно соответствовать CSS
     cardEl.innerHTML = 
         '<div class="card-inner">' +
-            '<div class="card-back fallback"></div>' +
+            '<div class="card-back' + (cardBackLoaded ? '' : ' fallback') + '"></div>' +
             '<div class="card-front">' +
-                '<img src="' + card.image + '" alt="' + card.name + '" class="card-image" onerror="this.style.display=\'none\';this.parentElement.querySelector(\'.card-placeholder\').style.display=\'flex\'">' +
-                '<div class="card-placeholder" style="display:none;align-items:center;justify-content:center;font-size:30px;height:100%">🃏</div>' +
+                '<img src="' + card.image + '" alt="' + card.name + '" class="card-image">' +
+                '<div class="card-placeholder">🃏</div>' +
                 '<div class="card-info">' +
                     '<div class="card-name">' + getShortName(card.name) + '</div>' +
                     '<div class="card-meaning">' + card.meaning + '</div>' +
                 '</div>' +
             '</div>' +
         '</div>';
+    
+    // Обработчики для изображения
+    const img = cardEl.querySelector('.card-image');
+    const placeholder = cardEl.querySelector('.card-placeholder');
+    
+    img.addEventListener('load', function() {
+        cardEl.classList.remove('card-has-error');
+        placeholder.style.display = 'none';
+        img.style.display = 'block';
+    });
+    
+    img.addEventListener('error', function() {
+        cardEl.classList.add('card-has-error');
+        placeholder.style.display = 'flex';
+        img.style.display = 'none';
+    });
     
     // Обработчик клика
     cardEl.addEventListener('click', function() {
@@ -208,18 +265,17 @@ function handleCardClick(card, cardEl) {
     const isFlipped = cardEl.classList.contains('flipped');
     
     if (isFlipped) {
-        // Карта уже перевернута — снимаем выделение
+        // Снимаем выделение
         cardEl.classList.remove('flipped', 'selected');
         selectedCards = selectedCards.filter(function(c) { 
             return c.name !== card.name; 
         });
     } else {
-        // Карта не перевернута — переворачиваем и выбираем
+        // Переворачиваем и выбираем
         if (selectedCards.length < 3) {
             cardEl.classList.add('flipped', 'selected');
             selectedCards.push(card);
         } else {
-            // Максимум 3 карты — показываем сообщение
             if (window.Telegram?.WebApp) {
                 window.Telegram.WebApp.showPopup({
                     title: 'Лимит',
@@ -232,7 +288,6 @@ function handleCardClick(card, cardEl) {
             return;
         }
     }
-    
     updateUI();
 }
 
@@ -243,30 +298,26 @@ function getShortName(fullName) {
 
 // === ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ===
 function updateUI() {
-    // Счётчик
     document.getElementById('selectedCount').textContent = selectedCards.length;
     
-    // Кнопка отправки
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = selectedCards.length !== 3;
     
-    // Список выбранных карт
     const resultsContainer = document.getElementById('resultsContainer');
     const selectedList = document.getElementById('selectedCardsList');
     
     if (selectedCards.length > 0) {
-        resultsContainer.style.display = 'block';
+        resultsContainer.classList.add('show');
         selectedList.innerHTML = selectedCards.map(function(card) {
             return '<div class="selected-card-item">' + getShortName(card.name) + '</div>';
         }).join('');
     } else {
-        resultsContainer.style.display = 'none';
+        resultsContainer.classList.remove('show');
     }
 }
 
 // === ПЕРЕМЕШАТЬ КАРТЫ ===
 function shuffleCards() {
-    // Сброс выбора
     selectedCards = [];
     
     // Анимация перемешивания
@@ -274,14 +325,15 @@ function shuffleCards() {
     cards.forEach(function(card, index) {
         card.style.transition = 'transform 0.2s';
         card.style.transform = 'scale(0.95) rotate(' + (Math.random() * 10 - 5) + 'deg)';
-        
         setTimeout(function() {
             card.style.transform = 'scale(1) rotate(0deg)';
         }, 200 + index * 30);
     });
     
-    // Перегенерация через 300мс
-    setTimeout(generateCards, 300);
+    // Перегенерация
+    setTimeout(function() {
+        generateCards();
+    }, 300);
 }
 
 // === ОТПРАВКА РАСКЛАДА ===
@@ -324,6 +376,6 @@ function submitCards() {
             alert('Ошибка отправки данных');
         }
     } else {
-        alert('Данные отправлены в консоль:\n' + JSON.stringify(result, null, 2));
+        alert('Данные в консоли:\n' + JSON.stringify(result, null, 2));
     }
 }

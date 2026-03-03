@@ -1,6 +1,4 @@
-// Полная колода Таро - 78 карт
 const TAROT_DECK = [
-    // ... (ваша колода без изменений — она корректна)
     // СТАРШИЕ АРКАНЫ (22 карты)
     { name: "0. Шут", meaning: "Начало, невинность, спонтанность", image: "images/fool.jpg", type: "major" },
     { name: "I. Маг", meaning: "Воля, мастерство, концентрация", image: "images/magician.jpg", type: "major" },
@@ -25,7 +23,7 @@ const TAROT_DECK = [
     { name: "XX. Суд", meaning: "Возрождение, призыв, прощение", image: "images/judgement.jpg", type: "major" },
     { name: "XXI. Мир", meaning: "Завершение, единство, достижение", image: "images/world.jpg", type: "major" },
 
-    // МЛАДШИЕ АРКАНЫ - ЖЕЗЛЫ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — ЖЕЗЛЫ (14 карт)
     { name: "Туз Жезлов", meaning: "Вдохновение, энергия, потенциал", image: "images/wands01.jpg", type: "wands" },
     { name: "2 Жезлов", meaning: "Планирование, решение, партнерство", image: "images/wands02.jpg", type: "wands" },
     { name: "3 Жезлов", meaning: "Предвидение, сотрудничество, расширение", image: "images/wands03.jpg", type: "wands" },
@@ -41,7 +39,7 @@ const TAROT_DECK = [
     { name: "Королева Жезлов", meaning: "Уверенность, независимость, харизма", image: "images/wands13.jpg", type: "wands" },
     { name: "Король Жезлов", meaning: "Лидерство, предпринимательство, видение", image: "images/wands14.jpg", type: "wands" },
 
-    // МЛАДШИЕ АРКАНЫ - КУБКИ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — КУБКИ (14 карт)
     { name: "Туз Кубков", meaning: "Новая любовь, эмоциональное начало", image: "images/cups01.jpg", type: "cups" },
     { name: "2 Кубков", meaning: "Партнерство, союз, притяжение", image: "images/cups02.jpg", type: "cups" },
     { name: "3 Кубков", meaning: "Праздник, дружба, сообщество", image: "images/cups03.jpg", type: "cups" },
@@ -57,7 +55,7 @@ const TAROT_DECK = [
     { name: "Королева Кубков", meaning: "Забота, интуиция, сострадание", image: "images/cups13.jpg", type: "cups" },
     { name: "Король Кубков", meaning: "Эмоциональный контроль, дипломатия", image: "images/cups14.jpg", type: "cups" },
 
-    // МЛАДШИЕ АРКАНЫ - МЕЧИ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — МЕЧИ (14 карт)
     { name: "Туз Мечей", meaning: "Прорыв, ясность, истина", image: "images/swords01.jpg", type: "swords" },
     { name: "2 Мечей", meaning: "Тупик, баланс, решение", image: "images/swords02.jpg", type: "swords" },
     { name: "3 Мечей", meaning: "Сердечная боль, печаль, конфликт", image: "images/swords03.jpg", type: "swords" },
@@ -73,7 +71,7 @@ const TAROT_DECK = [
     { name: "Королева Мечей", meaning: "Ясность, независимость, принципы", image: "images/swords13.jpg", type: "swords" },
     { name: "Король Мечей", meaning: "Интеллект, власть, истина", image: "images/swords14.jpg", type: "swords" },
 
-    // МЛАДШИЕ АРКАНЫ - ПЕНТАКЛИ (14 карт)
+    // МЛАДШИЕ АРКАНЫ — ПЕНТАКЛИ (14 карт)
     { name: "Туз Пентаклей", meaning: "Процветание, возможность, изобилие", image: "images/pents01.jpg", type: "pentacles" },
     { name: "2 Пентаклей", meaning: "Баланс, адаптация, приоритеты", image: "images/pents02.jpg", type: "pentacles" },
     { name: "3 Пентаклей", meaning: "Мастерство, сотрудничество, ремесло", image: "images/pents03.jpg", type: "pentacles" },
@@ -90,15 +88,12 @@ const TAROT_DECK = [
     { name: "Король Пентаклей", meaning: "Процветание, бизнес, лидерство", image: "images/pents14.jpg", type: "pentacles" }
 ];
 
-// ... существующий массив TAROT_DECK ...
-
 class TarotApp {
     constructor() {
         this.selectedCards = [];
         this.currentCards = [];
         this.question = this.getQuestionFromUrl();
         this.cardBackLoaded = false;
-        this.backgroundLoaded = false;
         this.isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         this.init();
     }
@@ -123,7 +118,7 @@ class TarotApp {
 
     renderQuestion() {
         const questionElement = document.getElementById('questionText');
-       ) { 
+        if (questionElement) { 
             let text = this.question;
             if (text.length > 100) text = text.substring(0, 100) + '...';
             questionElement.textContent = text;
@@ -204,8 +199,7 @@ class TarotApp {
             <div class="card-inner">
                 <div class="card-back"></div>
                 <div class="card-front">
-                    <img src="${card.image}" alt="${card.name}" class="card-image" data-card-name="${card.name}">
-                    <div class="card-info">
+                    <img src="${card.image}" alt="${card.name}" class="card-image" data-card-name                    <div class="card-info">
                         <div class="card-name">${this.getShortName(card.name)}</div>
                         <div class="card-meaning">${card.meaning}</div>
                     </div>
@@ -288,7 +282,7 @@ class TarotApp {
 
     updateCounter() {
         const counter = document.getElementById('selectedCount');
-        {
+        if (counter) {
             counter.textContent = this.selectedCards.length;
         }
     }

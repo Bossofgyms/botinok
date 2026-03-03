@@ -93,12 +93,13 @@ const TAROT_DECK = [
 class TarotApp {
     constructor() {
         this.selectedCards = [];
-        this.currentCards = [];
+        this.currentCardsData = [];  // ✅ Храним данные о картах в памяти
         this.question = this.getQuestionFromUrl();
         this.cardBackLoaded = false;
         this.backgroundLoaded = false;
         this.isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         this.isAnimating = false;
+        this.preloadedImages = new Map(); // ✅ Предзагрузка изображений для скорости
         this.init();
     }
 
@@ -135,6 +136,30 @@ class TarotApp {
         console.log('🔄 Предзагрузка активов...');
         this.loadCardBack();
         this.loadBackground();
+        this.preloadImages(); // ✅ Новая функция предзагрузки изображений
+    }
+
+    // ✅ ИСПРАВЛЕНО: Предзагрузка всех изображений перед генерацией
+    preloadImages() {
+        const totalImages = TAROT_DECK.length;
+        let loaded = 0;
+        
+        TAROT_DECK.forEach(card => {
+            if (!this.preloadedImages.has(card.image)) {
+                const img = new Image();
+                img.onload = () => {
+                    loaded++;
+                    console.log(`⏳ Загружено картинок: ${loaded}/${totalImages}`);
+                    if (loaded === totalImages) {
+                        console.log('✅ Все карты загружены в кэш!');
+                    }
+                };
+                img.onerror = () => {
+                    console.warn(`❌ Не удалось загрузить: ${card.image}`);
+                };
+                img.src = card.image;
+            }
+        });
     }
 
     loadCardBack() {
@@ -199,9 +224,9 @@ class TarotApp {
     }
 
     generateCards() {
-        console.log('🎴 Генерация карт...');
+        console.log('🎴 Генерация новых карт...');
         let availableCards = [...TAROT_DECK];
-        this.currentCards = this.shuffleArray([...availableCards]).slice(0, 5);
+        this.currentCardsData = this.shuffleArray([...availableCards]).slice(0, 5);
         this.renderCards();
     }
 
@@ -222,7 +247,9 @@ class TarotApp {
         }
 
         container.innerHTML = '';
-        this.currentCards.forEach((card, index) => {
+        
+        // ✅ Полностью очищаем и создаём новые элементы
+        this.currentCardsData.forEach((card, index) => {
             const cardElement = this.createCardElement(card, index);
             if (cardElement) {
                 container.appendChild(cardElement);
@@ -240,8 +267,9 @@ class TarotApp {
     createCardElement(card, index) {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
-        cardElement.dataset.cardName = card.name;
-
+        cardElement.dataset.cardId = card.name; // ✅ Уникальный ID для идентификации
+        
+        // ✅ Правильная структура HTML для 3D вращения
         cardElement.innerHTML = `
             <div class="card-inner">
                 <div class="card-back ${!this.cardBackLoaded ? 'fallback' : ''}"></div>
@@ -278,7 +306,15 @@ class TarotApp {
             if (placeholder) placeholder.style.display = 'flex';
         }
 
-        cardElement.addEventListener('click', () => this.toggleCard(card, cardElement));
+        // ✅ Обработчик клика только для самой карты, не для вложенных элементов
+        cardElement.addEventListener('click', (e) => {
+            // Игнорируем клики по изображениям и тексту
+            if (e.target.closest('.card-image') || e.target.closest('.card-info')) {
+                return;
+            }
+            this.toggleCard(card, cardElement);
+        });
+        
         return cardElement;
     }
 
@@ -288,12 +324,21 @@ class TarotApp {
 
     toggleCard(card, cardElement) {
         const isSelected = this.selectedCards.some(c => c.name === card.name);
+        const isFlipped = cardElement.classList.contains('flipped');
 
-        if (isSelected) {
+        // ✅ Если карта уже перевернута и выбрана — снимаем выбор
+        if (isSelected && isFlipped) {
             this.deselectCard(card, cardElement);
-        } else {
-            this.flipCard(card, cardElement);
+            return;
         }
+        
+        // ✅ Если карта перевернута, но не выбрана — просто убираем переворот
+        if (isFlipped) {
+            cardElement.classList.remove('flipped');
+            return;
+        }
+
+        this.flipCard(card, cardElement);
     }
 
     flipCard(card, cardElement) {
@@ -304,6 +349,13 @@ class TarotApp {
 
         if (this.isAnimating) return;
         this.isAnimating = true;
+
+        // ✅ Сбрасываем другие карты перед добавлением новой
+        document.querySelectorAll('.card').forEach(otherCard => {
+            if (otherCard !== cardElement) {
+                otherCard.classList.remove('selected');
+            }
+        });
 
         cardElement.classList.add('flipped', 'selected');
         this.selectedCards.push(card);
@@ -426,32 +478,58 @@ class TarotApp {
         }
     }
 
+    // ✅ ИСПРАВЛЕНО: Полное перемешивание с сохранением состояния
     shuffleCards() {
-        console.log('🔄 Перемешивание...');
+        console.log('🔄 Перемешивание карт...');
         
         this.isAnimating = true;
         
-        // Очищаем выбранные карты
+        // 1. Сохраняем выбранные карты
+        const savedSelection = [...this.selectedCards];
+        
+        // 2. Очищаем визуальные состояния всех карт
+        const allCardsElements = document.querySelectorAll('.card');
+        allCardsElements.forEach(card => {
+            card.classList.remove('flipped', 'selected');
+            card.classList.add('shake');
+        });
+
+        // 3. Блокируем все интерактивные элементы во время анимации
         this.selectedCards = [];
         this.updateCounter();
         this.updateSubmitButton();
         this.updateResults();
 
-        // Анимация тряски всех карт
-        const cards = document.querySelectorAll('.card');
-        cards.forEach((card, index) => {
-            card.classList.add('shake');
-            setTimeout(() => { card.classList.remove('shake'); }, 300);
+        // 4. Удаляем все карты из DOM
+        const container = document.getElementById('cardsContainer');
+        container.innerHTML = '';
+
+        // 5. Генерируем новые карты через 500ms после анимации
+        setTimeout(() => {
+            this.generateCards();
             
-            // Сброс всех карт к начальному состоянию
-            card.classList.remove('flipped', 'selected');
+            // 6. Восстанавливаем выбраные карты если они есть в новых
+            this.restoreSelection(savedSelection);
+            
+            this.isAnimating = false;
+        }, 600);
+    }
+
+    restoreSelection(savedSelection) {
+        // Проверяем, какие из выбранных карт остались в новом наборе
+        this.currentCardsData.forEach((card, index) => {
+            const isSaved = savedSelection.some(s => s.name === card.name);
+            const cardElement = document.querySelectorAll('.card')[index];
+            
+            if (isSaved && cardElement) {
+                cardElement.classList.add('flipped', 'selected');
+                this.selectedCards.push(card);
+            }
         });
 
-        // Новая генерация после завершения анимации
-        setTimeout(() => { 
-            this.generateCards();
-            setTimeout(() => { this.isAnimating = false; }, 500);
-        }, 500);
+        this.updateCounter();
+        this.updateSubmitButton();
+        this.updateResults();
     }
 }
 

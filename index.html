@@ -2,102 +2,501 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Таро Тест</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Таро Расклад</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: sans-serif;
-            background: #1a1a2e;
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .cards-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        /* === КАРТА === */
-        .card {
-            width: 100px;
-            height: 160px;
-            position: relative; /* ⚠️ КРИТИЧНО: для absolute children */
-            cursor: pointer;
-            perspective: 1000px;
-        }
-        .card-inner {
-            position: relative; /* ⚠️ БЫЛО absolute — МЕНЯЕМ на relative! */
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        .card.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid #8B4513;
-        }
-        /* Рубашка */
-        .card-back {
-            background: #2a2a3e;
-            font-size: 40px;
-        }
-        /* Лицо */
-        .card-front {
-            background: #1a1a2e;
-            transform: rotateY(180deg);
-            flex-direction: column;
-            padding: 5px;
-        }
-        .card-front img {
-            width: 100%;
-            height: 85%;
-            object-fit: contain;
-            border-radius: 5px;
-        }
-        .card-name {
-            font-size: 10px;
-            text-align: center;
-            margin-top: 5px;
-        }
-        .counter { margin: 10px; font-size: 16px; }
-        .btn {
-            padding: 12px 24px;
-            margin: 5px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            background: #ffd700;
-            color: #2F4F4F;
-        }
-        .btn:disabled { background: #666; color: #aaa; cursor: not-allowed; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #000;
+    min-height: 100vh;
+    color: white;
+    padding: 10px;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 12px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header h1 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.question {
+    background: rgba(255,255,255,0.2);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 8px 0;
+    font-size: 13px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    line-height: 1.3;
+}
+
+.counter {
+    font-size: 13px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    padding: 5px 12px;
+    border-radius: 15px;
+    display: inline-block;
+    margin: 6px 0;
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+    padding: 5px;
+    justify-items: center;
+}
+
+/* === КАРТА — ИСПРАВЛЕННАЯ СТРУКТУРА ДЛЯ 3D === */
+.card {
+    width: 75px;
+    height: 115px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    perspective: 1000px; /* ✅ Увеличено для лучшего 3D эффекта */
+    position: relative;
+    overflow: visible; /* ✅ Изменено с hidden для тени при выборе */
+}
+
+.card-inner {
+    position: relative; /* ✅ КРИТИЧНО: было absolute — меняем на relative */
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+    transform-style: preserve-3d; /* ✅ Сохраняет 3D для дочерних элементов */
+    border-radius: 5px;
+}
+
+/* ✅ Класс flipped переворачивает карту на 180° */
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+/* === ОБЕ СТОРОНЫ КАРТЫ === */
+.card-front, .card-back {
+    position: absolute; /* ✅ Абсолютное позиционирование для наложения */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* ✅ Скрывает обратную сторону при перевороте */
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* === РУБАШКА КАРТЫ === */
+.card-back {
+    background-color: #8B4513;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1px solid #D2B48C;
+    z-index: 10; /* ✅ Рубашка поверх по умолчанию */
+}
+
+.card-back.fallback {
+    background: linear-gradient(45deg, #8B4513, #A0522D) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-back.fallback::before {
+    content: "🃏";
+    font-size: 22px;
+    color: rgba(255,255,255,0.7);
+}
+
+/* === ЛИЦЕВАЯ СТОРОНА КАРТЫ === */
+.card-front {
+    background: #000;
+    transform: rotateY(180deg); /* ✅ Исходно повёрнута назад */
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #8B4513;
+    z-index: 20; /* ✅ Лицо поверх рубашки после переворота */
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* Placeholder для ошибок загрузки изображений */
+.card-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    z-index: 5;
+}
+
+.card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    color: white;
+    padding: 5px 4px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 30;
+}
+
+.card.flipped .card-info {
+    transform: translateY(0);
+}
+
+.card-name {
+    font-size: 9px;
+    font-weight: bold;
+    margin-bottom: 2px;
+    text-align: center;
+    line-height: 1.1;
+}
+
+.card-meaning {
+    font-size: 7px;
+    line-height: 1;
+    text-align: center;
+    opacity: 0.9;
+}
+
+/* === ВЫБРАННАЯ КАРТА === */
+.card.selected {
+    box-shadow: 0 0 12px rgba(255,215,0,0.8);
+    transform: translateY(-2px);
+}
+
+/* === РЕЗУЛЬТАТЫ === */
+.results-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 12px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    min-height: 45px;
+}
+
+.results-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.selected-cards {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.selected-card-item {
+    background: rgba(255,255,255,0.9);
+    color: #2F4F4F;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* === КНОПКИ === */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 5px;
+}
+
+.submit-btn, .shuffle-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.submit-btn {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #2F4F4F;
+}
+
+.submit-btn:disabled {
+    background: #666;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(255,215,0,0.4);
+}
+
+.shuffle-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.shuffle-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.instructions {
+    text-align: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 10px;
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    line-height: 1.2;
+}
+
+/* === АНИМАЦИИ === */
+@keyframes selectCard {
+    0% { transform: translateY(-2px) scale(1); }
+    50% { transform: translateY(-4px) scale(1.02); }
+    100% { transform: translateY(-2px) scale(1); }
+}
+
+.card.selected {
+    animation: selectCard 0.3s ease;
+}
+
+/* === АДАПТИВНОСТЬ — ВАШИ БРЕЙКПОИНТЫ === */
+
+/* Очень маленькие экраны */
+@media (max-width: 320px) {
+    body { padding: 8px; }
+    .cards-container { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 6px; 
+    }
+    .card { 
+        width: 70px; 
+        height: 105px; 
+    }
+    .header { 
+        padding: 10px; 
+        margin-bottom: 10px; 
+    }
+    .header h1 { font-size: 16px; }
+    .question { 
+        padding: 8px; 
+        font-size: 12px; 
+    }
+    .card-name { font-size: 8px; }
+    .card-meaning { font-size: 6px; }
+}
+
+/* Средние мобильные */
+@media (min-width: 321px) and (max-width: 375px) {
+    .cards-container { 
+        grid-template-columns: repeat(4, 1fr); 
+        justify-content: center;
+    }
+    .card { 
+        width: 72px; 
+        height: 108px; 
+    }
+}
+
+/* Большие мобильные */
+@media (min-width: 376px) and (max-width: 425px) {
+    .cards-container { 
+        grid-template-columns: repeat(4, 1fr); 
+        justify-content: center;
+    }
+    .card { 
+        width: 78px; 
+        height: 117px; 
+    }
+}
+
+/* Планшеты */
+@media (min-width: 426px) and (max-width: 767px) {
+    .cards-container { 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 10px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 85px; 
+        height: 127px; 
+    }
+    .card-name { font-size: 10px; }
+    .card-meaning { font-size: 8px; }
+}
+
+/* Десктоп */
+@media (min-width: 768px) {
+    .cards-container { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 12px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 100px; 
+        height: 150px; 
+    }
+    .card-name { font-size: 11px; }
+    .card-meaning { font-size: 9px; }
+    .header h1 { font-size: 22px; }
+    .question { font-size: 15px; }
+    body { padding: 15px; }
+}
+
+/* Большие десктопы */
+@media (min-width: 1024px) {
+    .cards-container { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 15px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 110px; 
+        height: 165px; 
+    }
+    .card-name { font-size: 12px; }
+    .card-meaning { font-size: 10px; }
+}
+
+/* Горизонтальная ориентация */
+@media (max-height: 500px) and (orientation: landscape) {
+    body { padding: 5px; }
+    .cards-container { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 5px; 
+        justify-content: center;
+    }
+    .card { 
+        width: 65px; 
+        height: 97px; 
+    }
+    .header { 
+        padding: 8px; 
+        margin-bottom: 8px; 
+    }
+    .header h1 { font-size: 14px; }
+    .question { 
+        padding: 6px; 
+        margin: 5px 0; 
+        font-size: 11px; 
+    }
+    .card-name { font-size: 7px; }
+    .card-meaning { font-size: 6px; }
+    .instructions { display: none; }
+    .actions { 
+        flex-direction: row; 
+        gap: 8px; 
+    }
+    .submit-btn, .shuffle-btn { 
+        padding: 8px; 
+        font-size: 12px; 
+    }
+}
+
+/* Оптимизация для сенсорных устройств */
+.cards-container {
+    -webkit-overflow-scrolling: touch;
+}
+
+.card {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Плавные переходы */
+.card, .card-inner, .card-front, .card-back {
+    transition: all 0.3s ease;
+}
     </style>
 </head>
 <body>
-    <h2>🔮 Тест переворота карт</h2>
-    <div class="counter">Выбрано: <span id="count">0</span>/3</div>
-    
-    <div class="cards-container" id="container"></div>
-    
-    <button class="btn" id="shuffle">🔄 Перемешать</button>
-    <button class="btn" id="submit" disabled>📨 Отправить</button>
+    <div class="container">
+        <div class="header">
+            <h1>🔮 Таро Расклад</h1>
+            <div class="question">
+                <strong>Вопрос:</strong> <span id="questionText">Загрузка...</span>
+            </div>
+            <div class="counter">
+                Выбрано: <span id="selectedCount">0</span>/3 карт
+            </div>
+        </div>
+
+        <div id="cardsContainer" class="cards-container">
+            <!-- Карты будут сгенерированы JavaScript -->
+        </div>
+
+        <div id="resultsContainer" class="results-container" style="display:none;">
+            <div class="results-title">✨ Выбранные карты:</div>
+            <div class="selected-cards" id="selectedCardsList"></div>
+        </div>
+
+        <div class="actions">
+            <button id="submitBtn" class="submit-btn" disabled>
+                📨 Отправить расклад
+            </button>
+            <button id="shuffleBtn" class="shuffle-btn">
+                🔄 Перемешать карты
+            </button>
+        </div>
+
+        <div class="instructions">
+            💡 Нажмите на карту, чтобы перевернуть.<br>
+            Выберите <b>3 карты из 5</b> для расклада.
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
